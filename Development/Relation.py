@@ -32,7 +32,27 @@ class Relation:
 			self.directional = nested_json["directional"]
 		else :
 			self.directional = True
-		
+	
+	def toJson(self,indent):
+		output = indent + "\t\"" + self.name +"\" : {\n"
+		output += indent +"\t\t\"nature\" : " + "\"relation\",\n"
+		if self.sources:
+			output += indent + "\t\t\"sources\" : ["
+			for src in self.sources:
+				output += "\"" + src +"\","
+			#erase last comma
+			output = output[:-1]
+			output += "],\n"
+		if self.targets:
+			output += indent + "\t\t\"targets\" : ["
+			for tg in self.targets:
+				output += "\"" + tg +"\","
+			#erase last comma
+			output = output[:-1] 
+			output += "],\n"
+		output += indent+"\t\t\"directional\" : " + str(self.directional)+"\n"
+		output += indent + "\t\t}"
+		return output
 	
 	#returns a string representation of this object in JSON format
 	def toStr(self,indent):
@@ -41,11 +61,13 @@ class Relation:
 			output += indent + "From : [" 
 			for src in self.sources:
 				output+=src + ","
+			#erase last comma
 			output = output[:-1] + "]\n"
 		if self.targets:
 			output += indent + "To : [" 
 			for tg in self.targets:
 				output+=tg + ","
+			#erase last comma
 			output = output[:-1] + "]\n"
 		output += indent + "Directional : " + str(self.directional) + "\n"
 		return output

@@ -2,10 +2,14 @@ import json
 from Relation import *
 class Object:
 	
-	#library of objects dictionary key = object name , value = Object
+	#library of all objects dictionary key = object name , value = Object
 	objects = dict()
 	#library of relations dictionary key = relation name , value = relation value
 	relations = dict()
+	#library with only the referenced objects
+	objectsLib = dict()
+	#library with only the referenced relations
+	relationsLib = dict()
 	
 	#finds the Object with the given name
 	@staticmethod	
@@ -38,10 +42,12 @@ class Object:
 				for objectName in target[key].keys():
 					object = Object(objectName,target[key][objectName])
 					Object.addObject(objectName,object)
+					Object.objectsLib[objectName]=object
 			if key == "relations":
 				for relationName in target[key].keys():
 					relation = Relation(relationName,target[key][relationName]) 
 					Object.addRelation(relationName,relation) 
+					Object.relationsLib[objectName]=relation
      	
 	#properties dictionary
 	#objects list of strings
@@ -148,28 +154,41 @@ class Object:
 	#returns a JSON representation of this object  
 	def toJson(self,indent):
 		output = indent + "{\n" 		 
-		output += indent + "\"nature\" : " + "\"object\"\n"
+		output += indent + "\"nature\" : " + "\"object\",\n"
 		if self.parent:
-			output += indent + "\"extends\" : \"" + self.parent +"\"\n"
+			output += indent + "\"extends\" : \"" + self.parent +"\",\n"
 		if self.objects:
-			output += indent + "\"objects\" : \n"+ indent +"{\n"
+			output += indent + "\"objects\" : "+ indent +"{\n"
 			for objName in self.objects :
-				output += indent + "\t\"" + objName + "\" : \n"
+				output += indent + "\t\"" + objName + "\" : "
 				object = Object.findObject(objName)
 				output += object.toJson(indent + "\t")
 				output += ",\n"
+			#erase last comma
 			output = output[:-2] + "\n"
-			output += indent  + "}\n"
+			output += indent  + "},\n"
+		if self.relations:
+			output += indent + "\t\"relations\" : {\n"
+			for rel in self.relations:
+				relation = Object.findRelation(rel)
+				output += relation.toJson(indent) + ",\n"
+			#erase last comma
+			output = output[:-2] + "\n"
+			output+="\t},\n"				
 		if self.properties:
-			output += indent + "\"properties\" : \n"+indent+"{\n"
+			output += indent + "\"properties\" : "+indent+"{\n"
 			for prop in self.properties.keys() :
 				output += indent+"\t" +"\""+prop +"\""+" : \"" + self.properties[prop] + "\",\n"
+			#erase last comma
 			output = output[:-2] + "\n"
 			output += indent  + "}\n"
+		else :
+			#erase last comma
+			output = output[:-2] + "\n"
 		output += indent + "}"
 		return output
 	
-	#no need for that function this is done in the constructor
+	#no need for that function this is done when reading
 	def flatten():
 		pass
 		
