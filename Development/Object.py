@@ -12,12 +12,14 @@ class Object:
 	relationsLib = dict()
 	
 	#finds the Object with the given name
+	#TODO handle "Error 03: the object xx is not defined !"
 	@staticmethod	
 	def findObject(name):
 		if name in Object.objects.keys() :
 			return Object.objects[name]
 		
 	#finds the relation with the given name	
+        #TODO handle "Error 04:the relation xx is not defined !"
 	@staticmethod
 	def findRelation(name):
 		if name in Object.relations.keys() :
@@ -29,7 +31,19 @@ class Object:
 	@staticmethod
 	def addRelation(name,value):
 		Object.relations[name]=value
-	
+
+#TODO handle "Error 01: xx in the xx not defined!"
+#handle "Error 02:the library file xx is not found!"
+#handle "Error 06:A cyclic dependency detected! The cycle is xx0-(include)->xx1-(extends)->xx2-(include)->..-(extends)->xx0."
+#handle "Error 07:Redundant object definition of "xx"!"
+#handle "Error 08:Redundant relation definition of "xx"!"
+#handle "Error 09:Incorrect library file format:(absence of xx)|(xx not recognized)!" 
+#handle "Warning 01:xx should not be defined in a libray relation."
+#handle "Warning 03: 'objects' and 'relations' in object A will be overriden by these of object B as A extends B"
+	@staticmethod
+	def val_lib(target):
+                pass
+        
 	@staticmethod
 	def readLibrary(file):
 		f=open(file,'r')        #open a file for reading
@@ -37,6 +51,7 @@ class Object:
 		#return a python object out of a json object
 		target=json.loads(s)
 		f.close()
+		val_lib(target)
 		for key in target.keys():			
 			if key == "objects":
 				for objectName in target[key].keys():

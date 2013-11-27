@@ -11,8 +11,8 @@ Error_table:
 5.(?)The relation of an object is not defined. "Error 05:the relation of object xx is not defined!"
 6.(val_lib)The presence of cyclic dependency in the library."Error 06:A cyclic dependency detected! The cycle is xx0-(include)->xx1-(extends)->xx2-(include)->..-(extends)->xx0."
 7.(val_root,val_lib)There are two objects xx and xx associated with the same string xx. "Error 07:Redundant object definition of "xx"!"
-8.(val_root,val_lib)There are two relations xx and xx associated with the same string xx. "Error 08:Redundant relation definition of "xx"!"
-9.(val_lib)The format of the library file is not correct, only three keys:"nature", "objects", "relations". "Error 09:Incorrect library file format:(absence of xx)|(xx not recognized)!" 
+8.(val_root,val_lib)There are two relations xx and xx associated with the same string xx. "Error 07:Redundant relation definition of "xx"!"
+9.(val_lib)The format of the library file is not correct, only three keys:"nature", "objects", "relations". "Error 08:Incorrect library file format:(absence of xx)|(xx not recognized)!" 
 Warning_table:
 1.(val_lib)The presence of "from" or "to" in a library relation."Warning 01:xx should not be defined in a libray relation."
 2.(val_root)The presence of a non-empty "library“ member in an object that is not the root object."Warning 02:Detect of a library member in xx, but xx is not the root object.

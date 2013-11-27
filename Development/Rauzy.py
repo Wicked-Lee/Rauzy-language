@@ -10,6 +10,7 @@ def parse(file):
 	#return a python object out of a json object
 	target=json.loads(s)
 	f.close()
+	val_root(target)
 	model = Object(file.split(".")[0],target)
 	return model
 
@@ -19,7 +20,12 @@ def parse(file):
 def toFile():
 	pass
 
-def validate(target):
+#TODO handle "Error 01: xx in the xx not defined!"
+#handle "Error 07:Redundant object definition of "xx"!"
+#handle "Error 07:Redundant relation definition of "xx"!"
+#handle "Warning 02:Detect of a library member in xx, but xx is not the root object."
+#handle "Warning 03: "objects" and "relations" in object A will be overriden by these of object B as A extends B"
+def val_root(target):
 	pass
 	
 #prints the model in screen
