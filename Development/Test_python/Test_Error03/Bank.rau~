@@ -2,18 +2,18 @@
 	"nature":"object",
 	"objects": 
 			{  
-			"Customer1":{
+			"Customer 1":{
 				"nature":"object",
 				"extends":"Human",
 				"properties" :{"name":"Georgios","lastname":"Papoutsakis"}
 			},
-			"Employer1":
+			"Employer 1":
 				{"nature":"object",
 				"extends":"Human",
 				"properties" : 
 					{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
 				},
-			"Account1":
+			"Account 1":
 				{"nature":"object",
 				"properties" : {"Id":"AB325E","amount":"30000"}
 				}  

@@ -36,8 +36,9 @@ class Object:
 #handle "Error 02:the library file xx is not found!"
 #handle "Error 05:the nature of xx is not correct!"
 #handle "Error 06:A cyclic dependency detected! The cycle is xx0-(include)->xx1-(extends)->xx2-(include)->..-(extends)->xx0."
-#handle "Error 07:Redundant definition of xx!"
-#handle "Error 08:Incorrect library file format:(absence of xx)|(xx not recognized)!" 
+#handle "Error 07:Redundant object definition of "xx"!"
+#handle "Error 08:Redundant relation definition of "xx"!"
+#handle "Error 09:Incorrect library file format:(absence of xx)|(xx not recognized)!" 
 #handle "Warning 01:xx should not be defined in a libray relation."
 #handle "Warning 03: 'objects' and 'relations' in object A will be overriden by these of object B as A extends B"
 	@staticmethod

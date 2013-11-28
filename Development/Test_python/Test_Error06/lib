@@ -15,7 +15,7 @@
 				},
 			"Team":{
 				"nature":"object",
-				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student2":{"nature":"object", "extends":"Student"}}
+				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student2":{"nature":"object", "extends":"Team"}}
 				"relations":{"Playwith":{"nature":relation","extends":"collaboration","directional":"false","from":"Student1","to":"Student2"}}				
 				}
 		},

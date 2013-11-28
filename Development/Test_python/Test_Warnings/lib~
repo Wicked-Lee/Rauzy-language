@@ -25,6 +25,8 @@
 				{
 				  "nautre":"relation",
 				  "directional":true,
+				  "from" : [ "Customer1" ],
+				  "to" : [ "Account1" ],
 				  "properties":{"posessions":"things"}
 				}
 			"collaboration":

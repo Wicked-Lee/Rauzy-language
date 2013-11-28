@@ -1,0 +1,1 @@
+1.In an object defined in the library, the field "directional" of a relation should be optional as it can herites the "directional" fields of its parent. 

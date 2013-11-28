@@ -3,7 +3,7 @@
 	"objects": 
 			{  
 			"Customer1":{
-				"nature":"object",
+				"nature":"OBject",
 				"extends":"Human",
 				"properties" :{"name":"Georgios","lastname":"Papoutsakis"}
 			},
@@ -22,7 +22,7 @@
 		{  
 		  "owns":
 		   {
-				 "nature" : "relation",
+				 "nature" : "NOITALER",
 				 "extends":"ownership",
 				 "from" : [ "Customer1" ],
 				 "to" : [ "Account1" ] 

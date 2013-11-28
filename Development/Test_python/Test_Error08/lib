@@ -1,5 +1,4 @@
 {
-	"nature":"library",
 	"objects": 
 		{
 			"Human":
@@ -33,5 +32,6 @@
 				  "directional":false,
 				  "properties":{"type":"working relation"}
 				}
-		}
+		},
+	"Test":"test"
 }

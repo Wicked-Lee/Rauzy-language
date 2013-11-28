@@ -13,7 +13,7 @@
 				"properties" : 
 					{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
 				},
-			"Account1":
+			"Employer1":
 				{"nature":"object",
 				"properties" : {"Id":"AB325E","amount":"30000"}
 				}  
@@ -27,7 +27,7 @@
 				 "from" : [ "Customer1" ],
 				 "to" : [ "Account1" ] 
 			},
-		  "HasOwner":
+		  "owns":
 			{
 				 "nature" : "relation", 
 				 "from" : [ "Account1" ],

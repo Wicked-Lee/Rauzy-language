@@ -12,6 +12,7 @@
 				"extends":"Human",
 				"properties" : 
 					{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
+				"library":"lib"
 				},
 			"Account1":
 				{"nature":"object",

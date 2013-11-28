@@ -1,0 +1,43 @@
+Test:
+a)This is a well written example, no errors or warnings should be raised
+Test_Error01:
+a)absence of "nature" in bank[objects][Customer 1]
+b)absence of "nature" in bank[relations][owns]
+c)absence of "from" in bank[relations][Hasowner]
+d)absence of "directional in bank[relations][owns]
+e)absence of "nature" in lib[objects][Human]
+f)absence of "nature" and "directional" in lib[relations][ownership]
+Test_Error02:
+a)The file "lib" is in not in the same library as "bank.rau"
+Test_Error03:
+a)bank[objects][Customer 1] extends "Human" while in "lib" it is "human"
+b)lib[objects][Student] extends "Human" while in "lib" it is "human"
+c)bank[relations][owns][to] contends "Account 1" while in bank[objects] we have "Account1"
+Test_Error04:
+a)lib[objects][Team][relations][playwith] extends "COllaboration" while in lib[relations] we have "collaboration"
+b)bank[relations][owns] extends "ownership1" while in lib[relations] we have "ownership"
+Test_Error05:
+a)In bank[objects][Customer1][nature] is "OBject", but "object" expected
+b)In bank[relations][owns][nature] is "NOITALER", but "relation" expected
+c)In lib[objects][Team][Student2][nature] is "object1", but "object" expected
+d)In lib[relations][ownership][nature] is "rel", but "relation" expected
+Test_Error06:
+a)In lib[objects][Team], we have the cyclic dependency "Team--includes-->Student2--extends-->Team"
+Test_Error07:
+a)In bank[objects], "Employer1" is defined redundantly
+b)In bank[relations],"owns" is defined redundantly
+c)In lib[objects][Team][objects], "Student1" is defined redundantly
+d)In lib[relations], "ownership" is defined redundantly
+Test_Error08:
+a)In lib, the field "nature" is absent
+b)In lib, the field "Test" is not recogonized
+
+Test_Warnings:
+Warning01:
+a)In lib[relations][ownership], there are "from" and "to" fields
+Warning02:
+a)In bank[objects][Employer1], there is "library" field
+b)In lib[objects][Team], there is "library" field
+Warning03:
+a)In bank[objects][Employer1], there is "objects" field as well as "extends" field
+

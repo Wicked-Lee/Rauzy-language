@@ -1,5 +1,0 @@
-{
-	"nature":"object",
-	"extends":"Human",
-	"properties" :{"name":"Georgios","lastname":"Papoutsakis"}
-}

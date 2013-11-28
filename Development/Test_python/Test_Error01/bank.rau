@@ -22,7 +22,6 @@
 		{  
 		  "owns":
 		   {
-				 "nature" : "relation",
 				 "extends":"ownership",
 				 "from" : [ "Customer1" ],
 				 "to" : [ "Account1" ] 
@@ -30,7 +29,6 @@
 		  "HasOwner":
 			{
 				 "nature" : "relation", 
-				 "from" : [ "Account1" ],
 				 "to" : [ "Customer1" ], 
 				 "directional" : false 
 			}	 

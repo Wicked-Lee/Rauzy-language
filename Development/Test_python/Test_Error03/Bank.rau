@@ -25,7 +25,7 @@
 				 "nature" : "relation",
 				 "extends":"ownership",
 				 "from" : [ "Customer1" ],
-				 "to" : [ "Account1" ] 
+				 "to" : [ "Account 1" ] 
 			},
 		  "HasOwner":
 			{

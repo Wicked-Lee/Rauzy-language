@@ -22,7 +22,8 @@ def toFile():
 
 #TODO handle "Error 01: xx in the xx not defined!"
 #handle "Error 05:the nature of xx is not correct!"
-#handle "Error 07:Redundant definition of xx!"
+#handle "Error 07:Redundant object definition of "xx"!"
+#handle "Error 07:Redundant relation definition of "xx"!"
 #handle "Warning 02:Detect of a library member in xx, but xx is not the root object."
 #handle "Warning 03: "objects" and "relations" in object A will be overriden by these of object B as A extends B"
 def val_root(target):

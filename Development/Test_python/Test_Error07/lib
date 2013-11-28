@@ -15,7 +15,7 @@
 				},
 			"Team":{
 				"nature":"object",
-				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student2":{"nature":"object", "extends":"Student"}}
+				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student1":{"nature":"object", "extends":"Student"}}
 				"relations":{"Playwith":{"nature":relation","extends":"collaboration","directional":"false","from":"Student1","to":"Student2"}}				
 				}
 		},
@@ -27,7 +27,7 @@
 				  "directional":true,
 				  "properties":{"posessions":"things"}
 				}
-			"collaboration":
+			"ownership":
 				{
 				  "nature":"relation",
 				  "directional":false,
