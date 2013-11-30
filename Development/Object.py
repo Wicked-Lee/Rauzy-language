@@ -42,8 +42,7 @@ class Object:
 #handle "Warning 03: 'objects' and 'relations' in object A will be overriden by these of object B as A extends B"
 	@staticmethod
 	def val_lib(target):
-                pass
-        
+                pass 
 	@staticmethod
 	def readLibrary(file):
 		f=open(file,'r')        #open a file for reading
