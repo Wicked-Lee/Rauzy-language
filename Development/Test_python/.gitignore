@@ -1,0 +1,6 @@
+#compiled source#
+#################
+*.pyc
+#deleted file backup#
+#####################
+*~

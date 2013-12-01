@@ -22,7 +22,7 @@
 						{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
 					},
 					"Employer2":
-					{"nature":"object",
+					{
 					"extends":"Human",
 					"properties" : 
 						{"name":"Wushika", "lastname":"nibula", "salary":"200000", "worksIn":"backdesk"}

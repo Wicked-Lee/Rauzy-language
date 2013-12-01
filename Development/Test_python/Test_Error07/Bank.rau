@@ -7,16 +7,19 @@
 				"extends":"Human",
 				"properties" :{"name":"Georgios","lastname":"Papoutsakis"}
 			},
-			"Employer1":
+			"Departement1":{
+				"nature":"object",
+				"objects":{
+				"Employer1":
 				{"nature":"object",
 				"extends":"Human",
 				"properties" : 
 					{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
 				},
-			"Employer1":
+			"Customer1":
 				{"nature":"object",
 				"properties" : {"Id":"AB325E","amount":"30000"}
-				}  
+				} } }
 			},
 	"relations":
 		{  
