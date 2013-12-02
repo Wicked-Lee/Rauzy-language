@@ -50,7 +50,7 @@ class Relation:
 			#erase last comma
 			output = output[:-1] 
 			output += "],\n"
-		output += indent+"\t\t\"directional\" : " + str(self.directional)+"\n"
+		output += indent+"\t\t\"directional\" : " + str(self.directional).lower()+"\n"
 		output += indent + "\t\t}"
 		return output
 	

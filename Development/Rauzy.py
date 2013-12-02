@@ -50,7 +50,21 @@ def parse(file):
 #One file for root object
 #One file (library) for the rest objects
 def toFile():
-    pass
+	if not os.path.exists('output'):
+		os.makedirs('output')
+	f = open('output/'+Object.model.name+'.rau','w')
+	f.write(Object.model.toJson(""))
+	lib = open('output/'+Object.model.library,'w')
+	library = "{\n \"nature\" : \"library\", \n \"objects\" : \n{\n"
+	for obj in Object.objectsLib:
+		library += "\t\""+obj+"\" : \n" + Object.objectsLib[obj].toJson("\t") +",\n"
+	library = library[:-2] + "\n"
+	library += "\t},\n \"relations\" : \n {\n"
+	for rel in Object.relationsLib:
+		library += Object.relationsLib[rel].toJson("\t") + "\n"
+	library += "\n}\n}"
+	lib.write(library)
+
 
 #TODO handle "Error 01: xx in the xx not defined!"
 #handle "Error 05:the nature of xx != correct!"

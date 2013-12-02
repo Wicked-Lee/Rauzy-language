@@ -43,26 +43,6 @@ class Object:
 	@staticmethod
 	def val_lib(target):
                 pass 
-	@staticmethod
-	def readLibrary(file):
-		f=open(file,'r')        #open a file for reading
-		s=f.read()              #read the content of file f
-		#return a python object out of a json object
-		target=json.loads(s)
-		f.close()
-		val_lib(target)
-		for key in target.keys():			
-			if key == "objects":
-				for objectName in target[key].keys():
-					object = Object(objectName,target[key][objectName])
-					Object.addObject(objectName,object)
-					Object.objectsLib[objectName]=object
-			if key == "relations":
-				for relationName in target[key].keys():
-					relation = Relation(relationName,target[key][relationName]) 
-					Object.addRelation(relationName,relation) 
-					Object.relationsLib[objectName]=relation
-     	
 	#properties dictionary
 	#objects list of strings
 	#relations list of strings	
@@ -72,15 +52,17 @@ class Object:
 		self.properties = properties
 		self.objects = objects
 		self.relations = relations
+		self.library = None
 	
 	def __init__(self,name,nested_json):
 		self.name = name
 		self.properties = dict()
-		self.relations = []
+		self.relations = []		
+		self.library = None
 		if "library" in nested_json.keys():
-			file = nested_json['library']
+			self.library = nested_json['library']
 			#updates the static dictionaries for the library objects/relations
-			Object.readLibrary(file)
+			Object.readLibrary(self.library)
 		if 'extends' in nested_json.keys():
 			self.parent = nested_json["extends"]
 			par = Object.findObject(self.parent)
@@ -169,6 +151,8 @@ class Object:
 	def toJson(self,indent):
 		output = indent + "{\n" 		 
 		output += indent + "\"nature\" : " + "\"object\",\n"
+		if self.library:
+			output += indent + "\"library\" : " + "\""+self.library+"\",\n"
 		if self.parent:
 			output += indent + "\"extends\" : \"" + self.parent +"\",\n"
 		if self.objects:
