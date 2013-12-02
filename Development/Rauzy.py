@@ -79,35 +79,35 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
     err_str=""
     war_str=""
     if 'nature' not in keys or target['nature']=='':
-            err_str+='Error01: the field [nature] is not defined in the object '+tarname+'!\n'
+        err_str+='Error01: the field [nature] is not defined in the object '+tarname+'!\n'
     elif target["nature"] != "object":
-            err_str+='Error 05:the nature of object '+tarname+' is not correct!\n'
+        err_str+='Error 05:the nature of object '+tarname+' is not correct!\n'
     if 'extends' in keys and target['extends'] != '' and 'objects' in keys:
-            target.pop("objects",None)
-            #print("after pop",target.keys())
-            war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
+		target.pop("objects",None)
+		#print("after pop",target.keys())
+		war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
     if 'objects' in keys and target['objects'] != '':
-            for key in target['objects'].keys():
-                    #with below, we can check "Error 07" at the different levels
-                    if key in list_obj:
-                        err_str+='Error 07:Redundant definition of object '+key+'!\n'
-                    else:
-                        list_obj.append(key)
-                    valstr=val_root(key,target['objects'][key],False,list_obj,list_rel)
-                    err_str+=valstr[0]
-                    war_str+=valstr[1]                 
+		for key in target['objects'].keys():
+			#with below, we can check "Error 07" at the different levels
+			if key in list_obj:
+				err_str+='Error 07:Redundant definition of object '+key+'!\n'
+			else:
+				list_obj.append(key)
+			valstr=val_root(key,target['objects'][key],False,list_obj,list_rel)
+			err_str+=valstr[0]
+			war_str+=valstr[1]                 
     if 'relations' in keys and target['relations'] != '' and isroot:
-            for key in target['relations'].keys():
-                if 'nature' not in target['relations'][key]:
-                        err_str+='Error01: the field [nature] is not defined in root[relations]'+key+']\n'
-                elif target['relations'][key]['nature'] != 'relation':
-                        err_str+='Error 05:the nature of'+tarname+'[relations]['+key+'] is not correct!\n'
-                if 'from' not in target['relations'][key]:
-                        err_str+='Error01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
-                if 'to' not in target['relations'][key]:
-                        err_str+='Error01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
-                if ('extends' not in target['relations'][key] or target['relations'][key]['extends']=='') and 'directional' not in target['relations'][key]:
-                        err_str+='Error01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
+		for key in target['relations'].keys():
+			if 'nature' not in target['relations'][key]:
+				err_str+='Error01: the field [nature] is not defined in root[relations]'+key+']\n'
+			elif target['relations'][key]['nature'] != 'relation':
+				err_str+='Error 05:the nature of'+tarname+'[relations]['+key+'] is not correct!\n'
+			if 'from' not in target['relations'][key]:
+				err_str+='Error01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
+			if 'to' not in target['relations'][key]:
+				err_str+='Error01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
+			if ('extends' not in target['relations'][key] or target['relations'][key]['extends']=='') and 'directional' not in target['relations'][key]:
+				err_str+='Error01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
     if 'library' in keys and target['library']!='' and not isroot:
         war_str+='Warning 02:Detect of a library member in'+tarname+',but '+tarname+' is not the root object\n'
     return err_str,war_str
