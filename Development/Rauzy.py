@@ -4,6 +4,7 @@ from Object import *
 from Relation import *
 from error import *
 from warning import *
+
 #define a "parse" function to parse a rau file for a model and create all Objects and Relations
 def dupe_checking_hook(pairs):
     result = dict()
@@ -28,24 +29,24 @@ def parse(file):
     #with object_pairs_hook method, we can check "Error 07" at the same level
     target=json.loads(s,object_pairs_hook=dupe_checking_hook)
     f.close()
+    model = None
     #To handle all the jason file format errors and warnings
     #err_str,war_str=val_root(file,target,True)[0:2]
     err_str,war_str=val_root(file,target,True,[],[])
     try:
-            if err_str != "":
-                    raise error(err_str)
+		if err_str != "":
+			raise error(err_str)
+		else:
+			model = Object(file.split(".")[0],target)
     except error as e:
-                e.toStr()
+		e.toStr()
     try:
-            if war_str != "":
-                    raise warning(war_str)
+		if war_str != "":
+			raise warning(war_str)
     except warning as w:
-            w.toStr()
-    #TO return the constructed model
-    model = Object(file.split(".")[0],target)
+		w.toStr()
+    #TO return the constructed model    
     return model
-    #To test val_root
-    #return target
 
 #writes the necessary files for this model
 #One file for root object
@@ -121,6 +122,7 @@ def printModel():
 #print parse("Bank.rau")
 #root Object
 #model = parse("Bank.rau")
+model = None
 print 'type \'help\' for help'
 input = raw_input('>>')
 while(input!='exit') :
@@ -140,7 +142,10 @@ while(input!='exit') :
 		print 'print \t\t\t to print the model in the screen'
 		print 'exit \t\t\t to exit'
 	elif input == 'print':
-		printModel()
+		if model:
+			printModel()
+		else:
+			print 'No model has been loaded'
 	elif input.startswith('save'):		
 		if len(input.split()) != 2:
 			print 'usage: save <folder name>'
