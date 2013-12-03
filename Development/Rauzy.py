@@ -41,10 +41,10 @@ def parse(file):
     except warning as w:
             w.toStr()
     #TO return the constructed model
-    #model = Object(file.split(".")[0],target)
-    #return model
+    model = Object(file.split(".")[0],target)
+    return model
     #To test val_root
-    return target
+    #return target
 
 #writes the necessary files for this model
 #One file for root object
@@ -75,18 +75,18 @@ def toFile():
 def val_root(tarname,target,isroot,list_obj,list_rel):
     #print(tarname,isroot)
     #print(target.keys())
-    keys=target.keys()
+    #keys=
     err_str=""
     war_str=""
-    if 'nature' not in keys or target['nature']=='':
+    if 'nature' not in target.keys() or target['nature']=='':
         err_str+='Error01: the field [nature] is not defined in the object '+tarname+'!\n'
     elif target["nature"] != "object":
         err_str+='Error 05:the nature of object '+tarname+' is not correct!\n'
-    if 'extends' in keys and target['extends'] != '' and 'objects' in keys:
+    if 'extends' in target.keys() and target['extends'] != '' and 'objects' in target.keys():
 		target.pop("objects",None)
 		#print("after pop",target.keys())
 		war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
-    if 'objects' in keys and target['objects'] != '':
+    if 'objects' in target.keys() and target['objects'] != '':
 		for key in target['objects'].keys():
 			#with below, we can check "Error 07" at the different levels
 			if key in list_obj:
@@ -96,7 +96,7 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
 			valstr=val_root(key,target['objects'][key],False,list_obj,list_rel)
 			err_str+=valstr[0]
 			war_str+=valstr[1]                 
-    if 'relations' in keys and target['relations'] != '' and isroot:
+    if 'relations' in target.keys() and target['relations'] != '' and isroot:
 		for key in target['relations'].keys():
 			if 'nature' not in target['relations'][key]:
 				err_str+='Error01: the field [nature] is not defined in root[relations]'+key+']\n'
@@ -108,14 +108,14 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
 				err_str+='Error01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
 			if ('extends' not in target['relations'][key] or target['relations'][key]['extends']=='') and 'directional' not in target['relations'][key]:
 				err_str+='Error01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
-    if 'library' in keys and target['library']!='' and not isroot:
+    if 'library' in target.keys() and target['library']!='' and not isroot:
         war_str+='Warning 02:Detect of a library member in'+tarname+',but '+tarname+' is not the root object\n'
     return err_str,war_str
                     
 #prints the model in screen
 def printModel():
-    print ("Model")
-    #print model.toStr("")
+    print "Model"
+    print model.toStr("")
 
 #print parse("Bank.rau")
 #root Object
@@ -128,9 +128,10 @@ def printModel():
 ##print("Test_Error05 finished!\n")
 ##target3=parse("Test_python/Test_Error07/Bank.rau")
 ##print("Test_Error07 finished!\n")
-target4=parse("Test_python/Test_Warnings/Bank.rau")
-print("Test_Warnings finished!\n")
-#printModel()
+#target4=parse("Test_python/Test_Warnings/Bank.rau")
+#print("Test_Warnings finished!\n")
+model = parse("Bank.rau")
+printModel()
 #print model.toJson("")
 
 #print Object.objects

@@ -31,6 +31,26 @@ class Object:
 	@staticmethod
 	def addRelation(name,value):
 		Object.relations[name]=value
+	
+	@staticmethod
+	def readLibrary(file):
+		f=open(file,'r')        #open a file for reading
+		s=f.read()              #read the content of file f
+		#return a python object out of a json object
+		target=json.loads(s)
+		f.close()
+		for key in target.keys():			
+			if key == "objects":
+				for objectName in target[key].keys():
+					object = Object(objectName,target[key][objectName])
+					Object.addObject(objectName,object)
+					Object.objectsLib[objectName]=object
+			if key == "relations":
+				for relationName in target[key].keys():
+					relation = Relation(relationName,target[key][relationName]) 
+					Object.addRelation(relationName,relation) 
+					Object.relationsLib[relationName]=relation
+    
 
 #TODO handle "Error 01: xx in the xx not defined!"
 #handle "Error 02:the library file xx is not found!"
@@ -42,7 +62,9 @@ class Object:
 #handle "Warning 03: 'objects' and 'relations' in object A will be overriden by these of object B as A extends B"
 	@staticmethod
 	def val_lib(target):
-                pass 
+		pass 
+				
+				
 	#properties dictionary
 	#objects list of strings
 	#relations list of strings	
