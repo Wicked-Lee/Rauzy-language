@@ -1,4 +1,5 @@
 import json
+import os
 from Object import *
 from Relation import *
 from error import *
@@ -49,12 +50,12 @@ def parse(file):
 #writes the necessary files for this model
 #One file for root object
 #One file (library) for the rest objects
-def toFile():
-	if not os.path.exists('output'):
-		os.makedirs('output')
-	f = open('output/'+Object.model.name+'.rau','w')
-	f.write(Object.model.toJson(""))
-	lib = open('output/'+Object.model.library,'w')
+def toFile(folder):
+	if not os.path.exists(folder):
+		os.makedirs(folder)
+	f = open(folder+'/'+model.name+'.rau','w')
+	f.write(model.toJson(""))
+	lib = open(folder + '/'+model.library,'w')
 	library = "{\n \"nature\" : \"library\", \n \"objects\" : \n{\n"
 	for obj in Object.objectsLib:
 		library += "\t\""+obj+"\" : \n" + Object.objectsLib[obj].toJson("\t") +",\n"
@@ -120,6 +121,35 @@ def printModel():
 #print parse("Bank.rau")
 #root Object
 #model = parse("Bank.rau")
+print 'type \'help\' for help'
+input = raw_input('>>')
+while(input!='exit') :
+	if input.startswith('read'):
+		if len(input.split()) != 2:
+			print 'usage: read <file name>'
+		else :
+			file = input.split()[1]
+			if not os.path.exists(file):
+				print 'file \'' + file + '\' does not exist!'
+			else:
+				model = parse(file)
+	elif input == "help":
+		print "Available commands"
+		print 'read <file name> \t to load a model'
+		print 'save <folder name> \t to save the model in a file'
+		print 'print \t\t\t to print the model in the screen'
+		print 'exit \t\t\t to exit'
+	elif input == 'print':
+		printModel()
+	elif input.startswith('save'):		
+		if len(input.split()) != 2:
+			print 'usage: save <folder name>'
+		else:
+			folder = input.split()[1]
+			toFile(folder)
+	else :
+		print 'type \'help\' for help'
+	input = raw_input('>>')
 
 #To test val_root
 ##target1=parse("Test_python/Test_Error01/Bank.rau")
@@ -130,8 +160,8 @@ def printModel():
 ##print("Test_Error07 finished!\n")
 #target4=parse("Test_python/Test_Warnings/Bank.rau")
 #print("Test_Warnings finished!\n")
-model = parse("Bank.rau")
-printModel()
+#model = parse("Bank.rau")
+#printModel()
 #print model.toJson("")
 
 #print Object.objects
