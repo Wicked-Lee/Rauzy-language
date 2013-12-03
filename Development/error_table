@@ -1,7 +1,7 @@
 Error_table:
 1.(val_root,val_lib)Absence of mandatory keys."Error 01: xx in the xx not defined!"
     a)For a Rauzy object, such members are mandatory:"nature"
-    b)For a rauzy relation, such members are mandatory:"nature","from" and "to"(not for the relations in the library), "directional"
+    b)For a rauzy relation, such members are mandatory:"nature","from" and "to"(not for the relations in the library), "directional"(not for a root relation extending another relation)
 2.(val_lib)The "library" value is not correct."Error 02:the library file xx is not found!"
     The "library" value must be a relative path from the location of the file.
 3.(findObject,)There is no object associated with a string xx when we want to extend an object in the library from the library or when we want to extend an object in the library from the root object or when we want to refer to an object defined in "objects" of the root object from the "relations" of the root object. "Error 03:the object xx is not defined !"
