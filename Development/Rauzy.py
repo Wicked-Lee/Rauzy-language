@@ -127,6 +127,10 @@ print 'type \'help\' for help'
 input = raw_input('>>')
 while(input!='exit') :
 	if input.startswith('read'):
+		Object.objects = dict()
+		Object.relations = dict()
+		Object.objectsLib = dict()
+		Object.relationsLib = dict()
 		if len(input.split()) != 2:
 			print 'usage: read <file name>'
 		else :

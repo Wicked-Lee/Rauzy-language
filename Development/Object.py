@@ -1,4 +1,5 @@
 import json
+from error import *
 from Relation import *
 class Object:
 	
