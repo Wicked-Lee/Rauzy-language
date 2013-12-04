@@ -17,10 +17,10 @@ class Object:
 	@staticmethod	
 	def findObject(name):
             try:
-		if name in Object.objects.keys() :
-			return Object.objects[name]
-		else:
-                        raise error("Error 03: the object "+name+" is not defined !")
+				if name in Object.objects.keys() :
+					return Object.objects[name]
+				else:
+					raise error("Error 03: the object "+name+" is not defined !")
             except error as e:
                 e.toStr()
 		
@@ -29,10 +29,10 @@ class Object:
 	@staticmethod
 	def findRelation(name):
             try:
-		if name in Object.relations.keys() :
-			return Object.relations[name]
-		else:
-                        raise error("Error 04:the relation "+name+" is not defined !")
+				if name in Object.relations.keys() :
+					return Object.relations[name]
+				else:
+					raise error("Error 04:the relation "+name+" is not defined !")
             except error as e:
                     e.toStr()
 	
@@ -46,27 +46,32 @@ class Object:
 	#handle "Error 02:the library file xx is not found!"
 	@staticmethod
 	def readLibrary(file):
-		f=open(file,'r')        #open a file for reading
-		s=f.read()              #read the content of file f
-		#To get rid of all the unmeaningful symbols after reading
-                s=s.replace("\n","")    #replace the string "\n" by ""
-                s=s.replace("\t","")    #replace the string "\t" by ""
-                s=" ".join(s.split())   #remove the duplicated spaces
-		#return a python object out of a json object
-		target=json.loads(s)
-		f.close()
-		#val_lib(file,target)
-		for key in target.keys():			
-			if key == "objects":
-				for objectName in target[key].keys():
-					object = Object(objectName,target[key][objectName])
-					Object.addObject(objectName,object)
-					Object.objectsLib[objectName]=object
-			if key == "relations":
-				for relationName in target[key].keys():
-					relation = Relation(relationName,target[key][relationName]) 
-					Object.addRelation(relationName,relation) 
-					Object.relationsLib[relationName]=relation
+		try:
+			with open(file):
+				f=open(file,'r')        #open a file for reading
+				s=f.read()              #read the content of file f
+				#To get rid of all the unmeaningful symbols after reading
+				s=s.replace("\n","")    #replace the string "\n" by ""
+				s=s.replace("\t","")    #replace the string "\t" by ""
+				s=" ".join(s.split())   #remove the duplicated spaces
+				#return a python object out of a json object
+				target=json.loads(s)
+				f.close()
+				#val_lib(file,target)
+				for key in target.keys():			
+					if key == "objects":
+						for objectName in target[key].keys():
+							object = Object(objectName,target[key][objectName])
+							Object.addObject(objectName,object)
+							Object.objectsLib[objectName]=object
+					if key == "relations":
+						for relationName in target[key].keys():
+							relation = Relation(relationName,target[key][relationName]) 
+							Object.addRelation(relationName,relation) 
+							Object.relationsLib[relationName]=relation
+		except IOError:
+		   print 'Error 02: library file is not found'
+		
     
 
 #TODO handle "Error 01: xx in the xx not defined!"
