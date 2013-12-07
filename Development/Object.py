@@ -3,6 +3,7 @@ from error import *
 from Relation import *
 class Object:
 	
+	folder = ""
 	#library of all objects dictionary key = object name , value = Object
 	objects = dict()
 	#library of relations dictionary key = relation name , value = relation value
@@ -47,14 +48,9 @@ class Object:
 	@staticmethod
 	def readLibrary(file):
 		try:
-			with open(file):
-				f=open(file,'r')        #open a file for reading
+			with open(Object.folder+file):
+				f=open(Object.folder+file,'r')        #open a file for reading
 				s=f.read()              #read the content of file f
-				#To get rid of all the unmeaningful symbols after reading
-				s=s.replace("\n","")    #replace the string "\n" by ""
-				s=s.replace("\t","")    #replace the string "\t" by ""
-				s=" ".join(s.split())   #remove the duplicated spaces
-				#return a python object out of a json object
 				target=json.loads(s)
 				f.close()
 				#val_lib(file,target)
@@ -70,7 +66,8 @@ class Object:
 							Object.addRelation(relationName,relation) 
 							Object.relationsLib[relationName]=relation
 		except IOError:
-		   print 'Error 02: library file is not found'
+			print IOError
+			print 'Error 02: library file is not found'
 		
     
 
@@ -178,7 +175,7 @@ class Object:
 					self.objects.append(objName)
 					Object.objects[objName] = object
 				else :  # case of empty str read from a file
-					f=open(objName+".rau",'r')        #open a file for reading
+					f=open(Object.folder+objName+".rau",'r')        #open a file for reading
 					s=f.read()              #read the content of file f
 					#return a python object out of a json object
 					target=json.loads(s)
@@ -190,7 +187,7 @@ class Object:
 		if 'relations' in nested_json.keys():
 			for rel in nested_json['relations'] :
 				if not nested_json['relations'][rel] : # case of empty str read from a file
-					f=open(rel+".rau",'r')        #open a file for reading
+					f=open(Object.folder+rel+".rau",'r')        #open a file for reading
 					s=f.read()              #read the content of file f
 					#return a python object out of a json object
 					target=json.loads(s)

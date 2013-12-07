@@ -18,35 +18,35 @@ def dupe_checking_hook(pairs):
     return result
 
 def parse(file):
-    #open and then read the file
-    f=open(file,'r')        #open a file for reading
-    s=f.read()              #read the content of file f
-    #To get rid of all the unmeaningful symbols after reading
-    s=s.replace("\n","")    #replace the string "\n" by ""
-    s=s.replace("\t","")    #replace the string "\t" by ""
-    s=" ".join(s.split())   #remove the duplicated spaces
-    #return a python object out of a json object
-    #with object_pairs_hook method, we can check "Error 07" at the same level
-    target=json.loads(s,object_pairs_hook=dupe_checking_hook)
-    f.close()
-    model = None
+	Object.folder = ""
+	folders = file.split("/")	
+	for i in range(0,len(folders)-1):
+		Object.folder += folders[i] +"/"
+	#open and then read the file
+	f=open(file,'r')        #open a file for reading
+	s=f.read()              #read the content of file f
+	#return a python object out of a json object
+	#with object_pairs_hook method, we can check "Error 07" at the same level
+	target=json.loads(s,object_pairs_hook=dupe_checking_hook)
+	f.close()
+	model = None
     #To handle all the jason file format errors and warnings
     #err_str,war_str=val_root(file,target,True)[0:2]
-    err_str,war_str=val_root(file,target,True,[],[])
-    try:
+	err_str,war_str=val_root(file,target,True,[],[])
+	try:
 		if err_str != "":
 			raise error(err_str)
 		else:
 			model = Object(file.split(".")[0],target)
-    except error as e:
+	except error as e:
 		e.toStr()
-    try:
+	try:
 		if war_str != "":
 			raise warning(war_str)
-    except warning as w:
+	except warning as w:
 		w.toStr()
     #TO return the constructed model    
-    return model
+	return model
 
 #writes the necessary files for this model
 #One file for root object
