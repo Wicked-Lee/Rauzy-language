@@ -50,23 +50,37 @@ class Object:
 				s=f.read()              #read the content of file f
 				target=json.loads(s)
 				f.close()
+				found = False
 				#val_lib(file,target)
+				for key in target.keys():	
+					if key == "nature":
+						found == True
+				if not found:
+					try:
+						raise error("Error 08: field nature is missing !")
+					except error as e:
+						e.toStr()
 				for key in target.keys():	
 					if key == "objects":
 						for objectName in target[key].keys() :
 							object = Object(objectName,target[key][objectName])
 							Object.addObject(objectName,object)
 							Object.objectsLib[objectName]=object
-					if key == "relations":
+					elif key == "relations":
 						for relationName in target[key].keys():
 							relation = Relation(relationName,target[key][relationName]) 
 							Relation.addRelation(relationName,relation)
 							Object.addRelation(relationName,relation) 
 							Object.relationsLib[relationName]=relation
+					elif key == 'nature':
+						pass
+					else:
+						raise error("Error 08: field "+key+" is not recognised !")
 		except IOError:
 			print IOError
 			print 'Error 02: library file is not found'
-		
+		except error as e:
+			e.toStr()
     
 
 #TODO handle "Error 01: xx in the xx not defined!"
