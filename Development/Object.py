@@ -52,12 +52,16 @@ class Object:
 				f.close()
 				found = False
 				#val_lib(file,target)
-				for key in target.keys():	
-					if key == "nature":
-						found == True
+				if "nature" in target.keys():
+					found = True
+					if target['nature']!='library':
+						try:
+							raise error("Error 08: field nature's value is not library !")
+						except error as e:
+							e.toStr()
 				if not found:
 					try:
-						raise error("Error 08: field nature is missing !")
+						raise error("Error 08: field nature in library is missing !")
 					except error as e:
 						e.toStr()
 				for key in target.keys():	
@@ -75,7 +79,7 @@ class Object:
 					elif key == 'nature':
 						pass
 					else:
-						raise error("Error 08: field "+key+" is not recognised !")
+						raise error("Error 08: field "+key+" in library is not recognised !")
 		except IOError:
 			print IOError
 			print 'Error 02: library file is not found'
