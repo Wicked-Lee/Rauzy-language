@@ -3,6 +3,7 @@ from error import *
 from Relation import *
 class Object:
 	
+	model = False
 	folder = ""
 	#library of all objects dictionary key = object name , value = Object
 	objects = dict()
@@ -17,16 +18,17 @@ class Object:
 	#TODO handle "Error 03: the object xx is not defined !"
 	@staticmethod	
 	def findObject(name):
-            try:
-				if name in Object.objects.keys() :
-					return Object.objects[name]
-				else:
-					raise error("Error 03: the object "+name+" is not defined !")
-            except error as e:
-                e.toStr()
-		
+		try:
+			if name in Object.objects.keys() :
+				return Object.objects[name]
+			else:
+				raise error("Error 03: the object "+name+" is not defined !")
+		except error as e:
+			if Object.model:
+				raise error("Error 03: the object "+name+" is not defined !")
+					
 	#finds the relation with the given name	
-        #TODO handle "Error 04:the relation xx is not defined !"
+    #TODO handle "Error 04:the relation xx is not defined !"
 	@staticmethod
 	def findRelation(name):
             try:
@@ -54,9 +56,9 @@ class Object:
 				target=json.loads(s)
 				f.close()
 				#val_lib(file,target)
-				for key in target.keys():			
+				for key in target.keys():	
 					if key == "objects":
-						for objectName in target[key].keys():
+						for objectName in target[key].keys() :
 							object = Object(objectName,target[key][objectName])
 							Object.addObject(objectName,object)
 							Object.objectsLib[objectName]=object
@@ -101,15 +103,15 @@ class Object:
                 if islib and 'relations' in target and target['relations']!='':
                         for key in target['relations'].keys():
                                 if 'nature' not in target['relations'][key]:
-                                        err_str+='Error01: the field [nature] is not defined in'+tarname+'[relations]['+key+']\n'
+                                        err_str+='Error01: the field [nature] is not defined in relation '+key+']\n'
                                 elif target['relations'][key]['nature'] != 'relation':
-                                        err_str+='Error 05:the nature of'+tarname+'[relations]['+key+'] is not correct!\n'
+                                        err_str+='Error 05:the nature of relation '+key+' is not correct!\n'
                                 if 'from' in target['relations'][key]:
-                                        war_str+='Warning 01: the field [from] should not be defined in '+tarname+'[relations]['+key+']\n'
+                                        war_str+='Warning 01: the field [from] should not be defined in relation '+key+']\n'
                                 if 'to' not in target['relations'][key]:
-                                        war_str+='Warning 01: the field [to] should not be defined in '+tarname+'[relations]['+key+']\n'
+                                        war_str+='Warning 01: the field [to] should not be defined in relation '+key+']\n'
                                 if 'directional' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
+                                        err_str+='Error 01: the field [directional] is not defined in relation '+key+']\n'
                 if not islib and 'relations' in target and target['relations']!='':
                         for key in target['relations'].keys():
                                 #with below, we can check "Error 07" at the different levels
@@ -119,14 +121,14 @@ class Object:
                                         list_rel.append(key)
                                 if 'nature' not in target['relations'][key]:
 				        err_str+='Error 01: the field [nature] is not defined in lib['+tarname+'][relations]['+key+']\n'
-                                elif target['relations'][key]['nature'] != 'relation':
-                                        err_str+='Error 05:the nature of'+tarname+'[relations]['+key+'] is not correct!\n'
+                                elif target['relations'][key]['nature'] != 'relation':										
+                                        err_str+='Error 05:the nature of relation '+key+' is not correct!\n'
                                 if 'from' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
+                                        err_str+='Error 01: the field [from] is not defined in relation '+key+']\n'
                                 if 'to' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
+                                        err_str+='Error 01: the field [to] is not defined in relation '+key+']\n'
                                 if ('extends' not in target['relations'][key] or target['relations'][key]['extends']=='') and 'directional' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
+                                        err_str+='Error 01: the field [directional] is not defined in relation '+key+']\n'
                 if islib:
                         for key in target.keys():
                             try:
@@ -153,20 +155,18 @@ class Object:
 		self.relations = []		
 		self.library = None
 		if "library" in nested_json.keys():
-			self.library = nested_json['library']
-			#updates the static dictionaries for the library objects/relations
-			Object.readLibrary(self.library)
+			self.library = nested_json['library']		
+		if 'properties' in nested_json.keys():
+			newProperties = nested_json["properties"]
+			for prop in newProperties.keys():
+				self.properties[prop] = newProperties[prop]			
+		#objects must be an array
 		if 'extends' in nested_json.keys():
 			self.parent = nested_json["extends"]
 			par = Object.findObject(self.parent)
 			self.inherit(par)
 		else :
 			self.parent = ""
-		if 'properties' in nested_json.keys():
-			newProperties = nested_json["properties"]
-			for prop in newProperties.keys():
-				self.properties[prop] = newProperties[prop]			
-		#objects must be an array
 		self.objects = []
 		if 'objects' in nested_json.keys():
 			for objName in nested_json['objects'].keys():

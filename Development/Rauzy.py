@@ -18,7 +18,9 @@ def dupe_checking_hook(pairs):
     return result
 
 def parse(file):
-	Object.folder = ""
+	Object.folder = ""	
+	Object.model = False
+	model = None
 	folders = file.split("/")	
 	for i in range(0,len(folders)-1):
 		Object.folder += folders[i] +"/"
@@ -28,8 +30,9 @@ def parse(file):
 	#return a python object out of a json object
 	#with object_pairs_hook method, we can check "Error 07" at the same level
 	target=json.loads(s,object_pairs_hook=dupe_checking_hook)
+	if "library" in target.keys():
+		Object.readLibrary(target['library'])
 	f.close()
-	model = None
     #To handle all the jason file format errors and warnings
     #err_str,war_str=val_root(file,target,True)[0:2]
 	err_str,war_str=val_root(file,target,True,[],[])
@@ -37,6 +40,7 @@ def parse(file):
 		if err_str != "":
 			raise error(err_str)
 		else:
+			Object.model = True
 			model = Object(file.split(".")[0],target)
 	except error as e:
 		e.toStr()
