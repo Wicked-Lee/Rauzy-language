@@ -18,26 +18,21 @@ class Object:
 	#TODO handle "Error 03: the object xx is not defined !"
 	@staticmethod	
 	def findObject(name):
-		try:
-			if name in Object.objects.keys() :
-				return Object.objects[name]
-			else:
-				raise error("Error 03: the object "+name+" is not defined !")
-		except error as e:
+		if name in Object.objects.keys() :
+			return Object.objects[name]
+		else:
 			if Object.model:
-				raise error("Error 03: the object "+name+" is not defined !")
+				raise error("Error 03: the object "+name+" is not defined !")			
 					
 	#finds the relation with the given name	
     #TODO handle "Error 04:the relation xx is not defined !"
 	@staticmethod
 	def findRelation(name):
-            try:
-				if name in Object.relations.keys() :
-					return Object.relations[name]
-				else:
-					raise error("Error 04:the relation "+name+" is not defined !")
-            except error as e:
-                    e.toStr()
+		if name in Object.relations.keys() :
+			return Object.relations[name]
+		else:
+			if Object.model:
+				raise error("Error 04:the relation "+name+" is not defined !")				                 
 	
 	@staticmethod
 	def addObject(name,object):
@@ -65,6 +60,7 @@ class Object:
 					if key == "relations":
 						for relationName in target[key].keys():
 							relation = Relation(relationName,target[key][relationName]) 
+							Relation.addRelation(relationName,relation)
 							Object.addRelation(relationName,relation) 
 							Object.relationsLib[relationName]=relation
 		except IOError:

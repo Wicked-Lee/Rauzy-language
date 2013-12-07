@@ -20,6 +20,7 @@ def dupe_checking_hook(pairs):
 def parse(file):
 	Object.folder = ""	
 	Object.model = False
+	Relation.model = False
 	model = None
 	folders = file.split("/")	
 	for i in range(0,len(folders)-1):
@@ -41,6 +42,7 @@ def parse(file):
 			raise error(err_str)
 		else:
 			Object.model = True
+			Relation.model = True
 			model = Object(file.split(".")[0],target)
 	except error as e:
 		e.toStr()
