@@ -107,11 +107,11 @@ class Object:
                                 elif target['relations'][key]['nature'] != 'relation':
                                         err_str+='Error 05:the nature of relation '+key+' is not correct!\n'
                                 if 'from' in target['relations'][key]:
-                                        war_str+='Warning 01: the field [from] should not be defined in relation '+key+']\n'
+                                        war_str+='Warning 01: the field [from] should not be defined in relation '+key+'\n'
                                 if 'to' not in target['relations'][key]:
-                                        war_str+='Warning 01: the field [to] should not be defined in relation '+key+']\n'
+                                        war_str+='Warning 01: the field [to] should not be defined in relation '+key+'\n'
                                 if 'directional' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [directional] is not defined in relation '+key+']\n'
+                                        err_str+='Error 01: the field [directional] is not defined in relation '+key+'\n'
                 if not islib and 'relations' in target and target['relations']!='':
                         for key in target['relations'].keys():
                                 #with below, we can check "Error 07" at the different levels
@@ -120,15 +120,15 @@ class Object:
                                 else:
                                         list_rel.append(key)
                                 if 'nature' not in target['relations'][key]:
-				        err_str+='Error 01: the field [nature] is not defined in lib['+tarname+'][relations]['+key+']\n'
+				        err_str+='Error 01: the field [nature] is not defined in  relation '+key+'\n'
                                 elif target['relations'][key]['nature'] != 'relation':										
                                         err_str+='Error 05:the nature of relation '+key+' is not correct!\n'
                                 if 'from' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [from] is not defined in relation '+key+']\n'
+                                        err_str+='Error 01: the field [from] is not defined in relation '+key+'\n'
                                 if 'to' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [to] is not defined in relation '+key+']\n'
+                                        err_str+='Error 01: the field [to] is not defined in relation '+key+'\n'
                                 if ('extends' not in target['relations'][key] or target['relations'][key]['extends']=='') and 'directional' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [directional] is not defined in relation '+key+']\n'
+                                        err_str+='Error 01: the field [directional] is not defined in relation '+key+'\n'
                 if islib:
                         for key in target.keys():
                             try:

@@ -2,27 +2,38 @@
 	"nature":"object",
 	"objects": 
 			{  
-			"Customer 1":{
-				"nature":"object",
+			"Customer1":{
 				"extends":"Human",
 				"properties" :{"name":"Georgios","lastname":"Papoutsakis"}
 			},
-			"Employer 1":
-				{"nature":"object",
-				"extends":"Human",
-				"properties" : 
-					{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
-				},
-			"Account 1":
+			"Account1":
 				{"nature":"object",
 				"properties" : {"Id":"AB325E","amount":"30000"}
+				},
+			"Department1":
+				{
+				"nature":"object",
+				"objects":
+				{
+					"Employer1":
+					{"nature":"object",
+					"extends":"Human",
+					"properties" : 
+						{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
+					},
+					"Employer2":
+					{
+					"extends":"Human",
+					"properties" : 
+						{"name":"Wushika", "lastname":"nibula", "salary":"200000", "worksIn":"backdesk"}
+					}	
+				}
 				}  
 			},
 	"relations":
 		{  
 		  "owns":
 		   {
-				 "nature" : "relation",
 				 "extends":"ownership",
 				 "from" : [ "Customer1" ],
 				 "to" : [ "Account1" ] 
@@ -30,7 +41,6 @@
 		  "HasOwner":
 			{
 				 "nature" : "relation", 
-				 "from" : [ "Account1" ],
 				 "to" : [ "Customer1" ], 
 				 "directional" : false 
 			}	 
