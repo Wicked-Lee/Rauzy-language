@@ -1,6 +1,11 @@
 import json
-from error import *
+import os
+import pprint
 from Relation import *
+from error import *
+from warning import *
+from collections import defaultdict
+
 class Object:
 	
 	model = False
@@ -13,26 +18,44 @@ class Object:
 	objectsLib = dict()
 	#library with only the referenced relations
 	relationsLib = dict()
-	
+
+	@staticmethod
+	def dupe_checking_hook(pairs):
+                result = dict()
+                for key,val in pairs:
+                        try:
+                                if key in result:
+                                        raise error('Error 07:Redundant definition of '+key+'!\n')
+                                result[key] = val
+                        except error as e:
+                                e.toStr()
+                return result
+        
 	#finds the Object with the given name
 	#TODO handle "Error 03: the object xx is not defined !"
 	@staticmethod	
 	def findObject(name):
-		if name in Object.objects.keys() :
-			return Object.objects[name]
-		else:
-			if Object.model:
-				raise error("Error 03: the object "+name+" is not defined !")			
+                try:
+                        if name in Object.objects.keys() :
+                                return Object.objects[name]
+                        else:
+                                if Object.model:
+                                        raise error("Error 03: the object "+name+" is not defined !")
+                except error as e:
+                        e.toStr()
 					
 	#finds the relation with the given name	
     #TODO handle "Error 04:the relation xx is not defined !"
 	@staticmethod
 	def findRelation(name):
-		if name in Object.relations.keys() :
-			return Object.relations[name]
-		else:
-			if Object.model:
-				raise error("Error 04:the relation "+name+" is not defined !")				                 
+                try:
+                        if name in Object.relations.keys() :
+                                return Object.relations[name]
+                        else:
+                                if Object.model:
+                                        raise error("Error 04:the relation "+name+" is not defined !")				                 
+                except error as e:
+                        e.toStr()
 	
 	@staticmethod
 	def addObject(name,object):
@@ -46,86 +69,137 @@ class Object:
 	def readLibrary(file):
 		try:
 			with open(Object.folder+file):
-				f=open(Object.folder+file,'r')        #open a file for reading
+				f=open(file,'r')        #open a file for reading
 				s=f.read()              #read the content of file f
-				target=json.loads(s)
+                                #To get rid of all the unmeaningful symbols after reading
+				s=s.replace("\n","")    #replace the string "\n" by ""
+				s=s.replace("\t","")    #replace the string "\t" by ""
+				s=" ".join(s.split())   #remove the duplicated spaces
+                                #return a python object out of a json object
+                                #with object_pairs_hook method, we can check "Error 07" at the same level
+				target=json.loads(s,object_pairs_hook=Object.dupe_checking_hook)
+                                #pprint.pprint(target)
 				f.close()
-				found = False
-				#val_lib(file,target)
-				if "nature" in target.keys():
-					found = True
-					if target['nature']!='library':
-						try:
-							raise error("Error 08: field nature's value is not library !")
-						except error as e:
-							e.toStr()
-				if not found:
-					try:
-						raise error("Error 08: field nature in library is missing !")
-					except error as e:
-						e.toStr()
-				for key in target.keys():	
-					if key == "objects":
-						for objectName in target[key].keys() :
-							object = Object(objectName,target[key][objectName])
-							Object.addObject(objectName,object)
-							Object.objectsLib[objectName]=object
-					elif key == "relations":
-						for relationName in target[key].keys():
-							relation = Relation(relationName,target[key][relationName]) 
-							Relation.addRelation(relationName,relation)
-							Object.addRelation(relationName,relation) 
-							Object.relationsLib[relationName]=relation
-					elif key == 'nature':
-						pass
-					else:
-						raise error("Error 08: field "+key+" in library is not recognised !")
+				reldict=defaultdict(list)
+				err_str,war_str=Object.val_lib(file,target,target,True,[],[],reldict)
+                                #pprint.pprint(reldict)
+                                #print('\n'*2)
+				err_str+=Object.cycle_test(reldict,[],'',True)
+##				for key in target.keys():	
+##					if key == "objects":
+##						for objectName in target[key].keys() :
+##							object = Object(objectName,target[key][objectName])
+##							Object.addObject(objectName,object)
+##							Object.objectsLib[objectName]=object
+##					elif key == "relations":
+##						for relationName in target[key].keys():
+##							relation = Relation(relationName,target[key][relationName]) 
+##							Relation.addRelation(relationName,relation)
+##							Object.addRelation(relationName,relation) 
+##							Object.relationsLib[relationName]=relation
+##					elif key == 'nature':
+##						pass
+##					else:
+##						raise error("Error 08: field "+key+" in library is not recognised !")
 		except IOError:
-			print IOError
-			print 'Error 02: library file is not found'
-		except error as e:
-			e.toStr()
+                        print (IOError)
+                        print ('Error 02: library file is not found')
+		try:
+                        if err_str!='':
+                                raise error(err_str)
+                except error as e:
+                        e.toStr()
+                try:
+                        if war_str!='':
+                                raise warning(war_str)
+                except warning as w:
+                        w.toStr()
     
 
-#TODO handle "Error 01: xx in the xx not defined!"
-#handle "Error 05:the nature of xx is not correct!"
-#handle "Error 06:A cyclic dependency detected! The cycle is xx0-(include)->xx1-(extends)->xx2-(include)->..-(extends)->xx0."
-#handle "Error 07:Redundant definition of xx!"
-#handle "Error 08:Incorrect library file format:(xx not recognized)!" 
-#handle "Warning 01:xx should not be defined in a libray relation."
-#handle "Warning 03: 'objects' and 'relations' in object A will be overriden by these of object B as A extends B"
-	@staticmethod
-	def val_lib(tarname,target,islib,list_obj,list_rel):
+        #handle "Error 06:A cyclic dependency detected! The cycle is
+        #"xx0-(include/extends)->xx1-(include/extends)->xx2-(include/extends)->..-(include/extends)->xx0"
+        def cycle_test(ct,tr,node,isroot):
+                err_str=''
+                if isroot:
+                        for key in ct.keys():
+                                tr=[]
+                                tr.append(key)
+                                #print(tr)
+                                err_str+=Object.cycle_test(ct,tr,key,False)
+                elif node in ct.keys() and ct[node]!='':
+                        for i in ct[node]:
+                                if i in tr:
+                                        tr.append(i)
+                                        temp=('Error 06:A cyclic dependency detected! The cycle is '+'-(include/extends)->'.join(tr)+'\n')
+                                        tr.remove(i)
+                                        return temp
+                                else:
+                                        tr.append(i)
+                                        #print(tr)
+                                        err_str+=Object.cycle_test(ct,tr,i,False)
+                                        if i in tr:
+                                                tr.remove(i)
+                                        #print(tr)
+                elif node not in ct.keys() or ct[node]!='':
+                        tr.remove(node)
+                        #print(tr)
+                return err_str
+
+        #handle "Error 01: xx in the xx not defined!"
+        #handle "Error 03:the object xx is not defined !"
+        #handle "Error 04:the relation xx is not defined !"
+        #handle "Error 05:the nature of xx is not correct!"
+        #handle "Error 07:Redundant definition of xx!"
+        #handle "Error 08:Incorrect library file format:(xx not recognized)!" 
+        #handle "Warning 01:xx should not be defined in a libray relation."
+        #handle "Warning 03: 'objects' and 'relations' in object A will be overriden by these of object B as A extends B"
+        @staticmethod
+        def val_lib(tarname,lib,target,islib,list_obj,list_rel,rd):
+                #pprint.pprint(target)
                 err_str=""
                 war_str=""
+                if not islib:
+                        if 'extends' in target and target['extends']!='':
+                                #print(target['extends'])
+                                rd[tarname].append(target['extends'])
+                                if target['extends'] not in lib['objects']:
+                                        err_str+="Error 03:the object "+target['extends']+" is not defined !"
+                        elif 'objects' in target and target['objects']!='':
+                                #print(target['objects'].keys())
+                                for key in target['objects'].keys():
+                                        rd[tarname].append(key)
                 if 'nature' not in target.keys() or target['nature']=='':
-                        err_str+='Error01: the field [nature] is not defined in the library '+tarname+'!\n'
+                        err_str+='Error 01: the field [nature] is not defined in the library '+tarname+'!\n'
                 elif target["nature"] != "library" and islib:
-                        err_str+='Error 05:the nature of library '+tarname+' is not correct!\n'
+                        err_str+='Error 05:the [nature] of library '+tarname+' is not correct!\n'
                 elif target['nature'] !='object' and not islib:
-                        err_str+='Error 05:the nature of object '+tarname+' is not correct!\n'
+                        err_str+='Error 05:the [nature] of object '+tarname+' is not correct!\n'
+                if 'extends' in target.keys() and target['extends'] != '' and 'objects' in target.keys():
+                        target.pop("objects",None)
+                        #print("after pop",target.keys())
+                        war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
                 if 'objects' in target.keys() and target['objects'] != '':
-                        for key in target['objects'].keys():
+                        for key in target['objects'].keys():    
                                 #with below, we can check "Error 07" at the different levels
                                 if key in list_obj:
                                         err_str+='Error 07:Redundant definition of object '+key+'!\n'
                                 else:
                                         list_obj.append(key)
-                                valstr=val_lib(key,target['objects'][key],False,list_obj,list_rel)
+                                valstr=Object.val_lib(key,lib,target['objects'][key],False,list_obj,list_rel,rd)
                                 err_str+=valstr[0]
-                                war_str+=valstr[1]
+                                war_str+=valstr[1]                        
                 if islib and 'relations' in target and target['relations']!='':
                         for key in target['relations'].keys():
                                 if 'nature' not in target['relations'][key]:
-                                        err_str+='Error01: the field [nature] is not defined in relation '+key+']\n'
+                                        err_str+='Error01: the field [nature] is not defined in'+tarname+'[relations]['+key+']\n'
                                 elif target['relations'][key]['nature'] != 'relation':
-                                        err_str+='Error 05:the nature of relation '+key+' is not correct!\n'
+                                        err_str+='Error 05:the [nature] of'+tarname+'[relations]['+key+'] is not correct!\n'
                                 if 'from' in target['relations'][key]:
-                                        war_str+='Warning 01: the field [from] should not be defined in relation '+key+'\n'
-                                if 'to' not in target['relations'][key]:
-                                        war_str+='Warning 01: the field [to] should not be defined in relation '+key+'\n'
+                                        war_str+='Warning 01: the field [from] should not be defined in '+tarname+'[relations]['+key+']\n'
+                                if 'to' in target['relations'][key]:
+                                        war_str+='Warning 01: the field [to] should not be defined in '+tarname+'[relations]['+key+']\n'
                                 if 'directional' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [directional] is not defined in relation '+key+'\n'
+                                        err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
                 if not islib and 'relations' in target and target['relations']!='':
                         for key in target['relations'].keys():
                                 #with below, we can check "Error 07" at the different levels
@@ -133,24 +207,29 @@ class Object:
                                         err_str+='Error 07:Redundant definition of relation '+key+'!\n'
                                 else:
                                         list_rel.append(key)
+                                if 'extends' in target['relations'][key] and target['relations'][key]['extends']!='':
+                                        if 'relations' not in lib or lib['relations']=='' or target['relations'][key]['extends'] not in lib['relations'].keys():
+                                                err_str+='Error 04:the relation ['+target['relations'][key]['extends']+'] extended by ['+key+ '] is not defined !\n'
                                 if 'nature' not in target['relations'][key]:
-				        err_str+='Error 01: the field [nature] is not defined in  relation '+key+'\n'
-                                elif target['relations'][key]['nature'] != 'relation':										
-                                        err_str+='Error 05:the nature of relation '+key+' is not correct!\n'
+                                        err_str+='Error 01: the field [nature] is not defined in lib['+tarname+'][relations]['+key+']\n'
+                                elif target['relations'][key]['nature'] != 'relation':
+                                        err_str+='Error 05:the [nature] of'+tarname+'[relations]['+key+'] is not correct!\n'
                                 if 'from' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [from] is not defined in relation '+key+'\n'
+                                        err_str+='Error 01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
                                 if 'to' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [to] is not defined in relation '+key+'\n'
-                                if ('extends' not in target['relations'][key] or target['relations'][key]['extends']=='') and 'directional' not in target['relations'][key]:
-                                        err_str+='Error 01: the field [directional] is not defined in relation '+key+'\n'
+                                        err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
+                                if 'extends' not in target['relations'][key] or target['relations'][key]['extends']=='':
+                                        if 'directional' not in target['relations'][key] or target['relations'][key]=='':
+                                                err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
+                                elif 'directional' in target['relations'][key] and target['relations'][key]['directional']!='':
+                                        war_str+="Warning 03: [directional] in relation "+key+" will be overriden by that of relation "+target['relations'][key]['extends']+" as "+key+" extends "+target['relations'][key]['extends']+"\n"
                 if islib:
                         for key in target.keys():
-                            try:
                                 if key not in ['nature','objects','relations']:
-                                        raise error("Error 08:Incorrect library file format: "+key+" not recognized!\n")
-                            except error as e:
-                                e.toStr()
-                                #err_str+=e.msg
+                                        err_str+="Error 08:Incorrect library file format: ["+key+"] not recognized!\n"
+                if 'library' in target.keys() and target['library']!='':
+                        war_str+='Warning 02:Detect of a library member in '+tarname+',but '+tarname+' is not the root object\n'
+                return [err_str,war_str]
                         				
 	#properties dictionary
 	#objects list of strings
@@ -297,4 +376,15 @@ class Object:
 	def flatten():
 		pass
 		
-	
+####################################################################################
+##################
+#To test val_lib#
+##################                
+##for i in ['1','2','3','4','5','6','7','8']:
+##    file='Test_python/Test_Error0'+i+'/lib'
+##    Object.readLibrary(file)
+##    print('*'*80+'\nTest_error0'+i+' finished!\n'+'*'*80+'\n')        
+##file="Test_python/Test_Warnings/lib"
+##Object.readLibrary(file)
+##print("Test_Warnings finished!\n")
+####################################################################################

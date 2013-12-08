@@ -18,7 +18,7 @@
 		{
 			"ownership":
 				{
-				  "nautre":"relation",
+				  "nature":"relation",
 				  "directional":true,
 				  "properties":{"posessions":"things"}
 				}

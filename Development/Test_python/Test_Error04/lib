@@ -16,14 +16,14 @@
 			"Team":{
 				"nature":"object",
 				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student2":{"nature":"object", "extends":"Student"}},
-				"relations":{"Playwith":{"nature":"relation","extends":"COllaboration","directional":"false","from":"Student1","to":"Student2"}}				
+				"relations":{"Playwith":{"nature":"relation","extends":"COllaboration","from":"Student1","to":"Student2"}}				
 				}
 		},
 	"relations":
 		{
 			"ownership":
 				{
-				  "nautre":"relation",
+				  "nature":"relation",
 				  "directional":true,
 				  "properties":{"posessions":"things"}
 				},

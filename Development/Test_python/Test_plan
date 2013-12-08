@@ -1,6 +1,7 @@
 Test:
 a)This is a well written example, no errors or warnings should be raised
-Test_Error01: "xx in the xx not defined!"
+
+Test_Error 01: "xx in the xx not defined!"
 a)absence of "nature" in bank[objects][Customer1]
 b)absence of "nature" in bank[objects][Department1][Employer2]
 b)absence of "nature" in bank[relations][owns]
@@ -8,38 +9,50 @@ c)absence of "from" in bank[relations][Hasowner]
 d)absence of "directional in bank[relations][owns]
 e)absence of "nature" in lib[objects][Human]
 f)absence of "nature" and "directional" in lib[relations][ownership]
-Test_Error02:"the library file xx is not found!"
+
+Test_Error 02:"the library file xx is not found!"
 a)The file "lib" is in not in the same library as "bank.rau"
-Test_Error03:"the object xx is not defined !"
-a)bank[objects][Customer 1] extends "Human" while in "lib" it is "human"
+
+Test_Error 03:"the object xx is not defined !"
+a)TODO bank[objects][Customer 1] extends "Human" while in "lib" it is "human"
 b)lib[objects][Student] extends "Human" while in "lib" it is "human"
-c)bank[relations][owns][to] contends "Account 1" while in bank[objects] we have "Account1"
-Test_Error04:"the relation xx is not defined !"
+c)TODO bank[relations][owns][to] contends "Account 1" while in bank[objects] we have "Account1"
+
+Test_Error 04:"the relation xx is not defined !"
 a)lib[objects][Team][relations][playwith] extends "COllaboration" while in lib[relations] we have "collaboration"
-b)bank[relations][owns] extends "ownership1" while in lib[relations] we have "ownership"
-Test_Error05:"the nature of xx is not correct!"
+b)TODO bank[relations][owns] extends "ownership1" while in lib[relations] we have "ownership"
+
+Test_Error 05:"the nature of xx is not correct!"
 a)In bank[objects][Customer1][nature] is "OBject", but "object" expected
 b)In bank[relations][owns][nature] is "NOITALER", but "relation" expected
 c)In lib[objects][Team][Student2][nature] is "object1", but "object" expected
 d)In lib[relations][ownership][nature] is "rel", but "relation" expected
-Test_Error06:"A cyclic dependency detected! The cycle is xx0-(include)->xx1-(extends)->xx2-(include)->..-(extends)->xx0."
-a)In lib[objects][Team], we have the cyclic dependency "Team--includes-->Student2--extends-->Team"
-Test_Error07:"Redundant definition of xx!"
+
+Test_Error 06:"A cyclic dependency detected! The cycle is xx0-(include)->xx1-(extends)->xx2-(include)->..-(extends)->xx0."
+a)In lib[objects][Team], we have the cyclic dependency "Team--includes-->Student2--extends-->Team" and "Student2--includes-->team--extends-->Student2"
+
+Test_Error 07:"Redundant definition of xx!"
 a)In bank[objects], "Employer1" is defined redundantly
 b)In bank[relations],"owns" is defined redundantly
 c)In lib[objects][Team][objects], "Student1" is defined redundantly
 d)In lib[relations], "ownership" is defined redundantly
-Test_Error08:"Incorrect library file format:(absence of xx)|(xx not recognized)!"
+
+Test_Error 08:"Incorrect library file format:(absence of xx)|(xx not recognized)!"
 a)In lib, the field "nature" is absent
 b)In lib, the field "Test" is not recogonized
 
+
+
 Test_Warnings:
-Warning01:"xx should not be defined in a libray relation."
+Warning 01:"xx should not be defined in a libray relation."
 a)In lib[relations][ownership], there are "from" and "to" fields
-Warning02:"Detect of a library member in xx, but xx is not the root object."
+
+Warning 02:"Detect of a library member in xx, but xx is not the root object."
 a)In bank[objects][Employer1], there is "library" field
 b)In lib[objects][Team1], there is "library" field
-Warning03:"[objects] and [relations] in object A will be overriden by these of object B as A extends B"
-a)In bank[objects][Employer1], there is "objects" field as well as "extends" field
-b)In lib[objects][Team2], there are "objects" and "relations" field as well as "extends" field
 
+Warning 03:"[objects] and [relations] in object A will be overriden by these of object B as A extends B"
+a)In bank[objects][Employer1], there is "objects" field as well as "extends" field
+b)In lib[objects][Team2] and , there are "objects" and "relations" field as well as "extends" field
+
+Warning 04:"[directional] in relation A will be overriden by that of relation B as A extends B"

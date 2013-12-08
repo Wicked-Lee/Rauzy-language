@@ -15,15 +15,15 @@
 				},
 			"Team1":{
 				"nature":"object",
-				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student2":{"nature":"object", "extends":"Student"}}
-				"relations":{"Playwith":{"nature":relation","extends":"collaboration","directional":"false","from":"Student1","to":"Student2"}},		
+				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student2":{"nature":"object", "extends":"Student"}},
+				"relations":{"Playwith":{"nature":"relation", "extends":"collaboration", "directional":false, "from":"Student1", "to":"Student2"}},		
 				"library":"lib"		
 				},
 			"Team2":{
 				"nature":"object",
 				"extends":"Team1",
-				"objects":{"Student3":{"nature":"object", "extends":"Student"},"Student4":{"nature":"object", "extends":"Student"}}
-				"relations":{"Playwith":{"nature":relation","extends":"collaboration","directional":"false","from":"Student3","to":"Student4"}},		
+				"objects":{"Student3":{"nature":"object", "extends":"Student"},"Student4":{"nature":"object", "extends":"Student"}},
+				"relations":{"Playwith1":{"nature":"relation","extends":"collaboration","directional":"false","from":"Student3","to":"Student4"}},		
 				"library":"lib"		
 				}
 		},
@@ -31,12 +31,12 @@
 		{
 			"ownership":
 				{
-				  "nautre":"relation",
+				  "nature":"relation",
 				  "directional":true,
-				  "from" : [ "Customer1" ],
-				  "to" : [ "Account1" ],
+				  "from" : "Customer1",
+				  "to" : "Account1",
 				  "properties":{"posessions":"things"}
-				}
+				},
 			"collaboration":
 				{
 				  "nature":"relation",
