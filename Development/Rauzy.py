@@ -18,41 +18,57 @@ def dupe_checking_hook(pairs):
     return result
 
 def parse(file):
-	Object.folder = ""	
-	Object.model = False
-	Relation.model = False
-	model = None
-	folders = file.split("/")	
-	for i in range(0,len(folders)-1):
-		Object.folder += folders[i] +"/"
-	#open and then read the file
-	f=open(file,'r')        #open a file for reading
-	s=f.read()              #read the content of file f
-	#return a python object out of a json object
-	#with object_pairs_hook method, we can check "Error 07" at the same level
-	target=json.loads(s,object_pairs_hook=dupe_checking_hook)
-	if "library" in target.keys():
-		Object.readLibrary(target['library'])
-	f.close()
-    #To handle all the jason file format errors and warnings
-    #err_str,war_str=val_root(file,target,True)[0:2]
-	err_str,war_str=val_root(file,target,True,[],[])
-	try:
-		if err_str != "":
-			raise error(err_str)
-		else:
-			Object.model = True
-			Relation.model = True
-			model = Object(file.split(".")[0],target)
-	except error as e:
-		e.toStr()
-	try:
-		if war_str != "":
-			raise warning(war_str)
-	except warning as w:
-		w.toStr()
+##      Object.folder = ""	
+##	Object.model = False
+##	Relation.model = False
+##	model = None
+##        folders = file.split("/")	
+##        for i in range(0,len(folders)-1):
+##                Object.folder += folders[i] +"/"
+                
+        #open and then read the file
+        err_str=''
+        war_str=''
+        f=open(file,'r')        #open a file for reading
+        s=f.read()              #read the content of file f
+        #return a python object out of a json object
+        #with object_pairs_hook method, we can check "Error 07" at the same level
+        target=json.loads(s,object_pairs_hook=dupe_checking_hook)
+##        print('*'*80+'\nErrors and Warnings!\n'+'*'*80+'\n') 
+        if "library" in target.keys():
+                lib=''
+                folders=file.split("/")
+                for i in range(0,len(folders)-1):
+                        lib+=folders[i]+"/"
+                lib+="lib"
+                Object.readLibrary(lib)
+##                Object.readLibrary(target['library'])
+##                valstr=Object.readLibrary(target['library'])
+##                err_str+=valstr[0]
+##                war_str+=valstr[1]
+        f.close()
+        #To handle all the jason file format errors and warnings
+        #err_str,war_str=val_root(file,target,True)[0:2]
+        valstr=val_root(file,target,True,[],[])
+        err_str+=valstr[0]
+        war_str+=valstr[1]
+        try:
+                if err_str != "":
+                        raise error(err_str)
+                else:
+                        Object.model = True
+                        Relation.model = True
+                        model = Object(file.split(".")[0],target)
+        except error as e:
+                e.toStr()
+        try:
+                if war_str != "":
+                        raise warning(war_str)
+        except warning as w:
+                w.toStr()
+##        print('*'*80+'\nErrors and Warnings!\n'+'*'*80+'\n') 
     #TO return the constructed model    
-	return model
+##	return model
 
 #writes the necessary files for this model
 #One file for root object
@@ -130,7 +146,7 @@ def printModel():
 #root Object
 #model = parse("Bank.rau")
 ##model = None
-##print 'type \'help\' for help'
+##print ('type \'help\' for help')
 ##input = raw_input('>>')
 ##while(input!='exit') :
 ##	if input.startswith('read'):
@@ -139,32 +155,32 @@ def printModel():
 ##		Object.objectsLib = dict()
 ##		Object.relationsLib = dict()
 ##		if len(input.split()) != 2:
-##			print 'usage: read <file name>'
+##			print ('usage: read <file name>')
 ##		else :
 ##			file = input.split()[1]
 ##			if not os.path.exists(file):
-##				print 'file \'' + file + '\' does not exist!'
+##				print ('file \'' + file + '\' does not exist!')
 ##			else:
 ##				model = parse(file)
 ##	elif input == "help":
-##		print "Available commands"
-##		print 'read <file name> \t to load a model'
-##		print 'save <folder name> \t to save the model in a file'
-##		print 'print \t\t\t to print the model in the screen'
-##		print 'exit \t\t\t to exit'
+##		print ("Available commands")
+##		print ('read <file name> \t to load a model')
+##		print ('save <folder name> \t to save the model in a file')
+##		print ('print \t\t\t to print the model in the screen')
+##		print ('exit \t\t\t to exit')
 ##	elif input == 'print':
 ##		if model:
 ##			printModel()
 ##		else:
-##			print 'No model has been loaded'
+##			print ('No model has been loaded')
 ##	elif input.startswith('save'):		
 ##		if len(input.split()) != 2:
-##			print 'usage: save <folder name>'
+##			print ('usage: save <folder name>')
 ##		else:
 ##			folder = input.split()[1]
 ##			toFile(folder)
 ##	else :
-##		print 'type \'help\' for help'
+##		print ('type \'help\' for help')
 ##	input = raw_input('>>')
 
 ####################################################################################
@@ -179,6 +195,18 @@ file="Test_python/Test_Warnings/Bank.rau"
 target=parse(file)
 print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')   
 ################################################################################
+####################################################################################
+##################
+#To test val_lib#
+##################                
+##for i in ['1','2','3','4','5','6','7','8']:
+##    file='Test_python/Test_Error0'+i+'/lib'
+##    Object.readLibrary(file)
+##    print('*'*80+'\nTest_error0'+i+' finished!\n'+'*'*80+'\n')        
+##file="Test_python/Test_Warnings/lib"
+##Object.readLibrary(file)
+##print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n') 
+####################################################################################
 #model = parse("Bank.rau")
 #printModel()
 #print model.toJson("")

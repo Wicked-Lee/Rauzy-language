@@ -8,19 +8,19 @@ from collections import defaultdict
 
 class Object:
 	
-	model = False
-	folder = ""
-	#library of all objects dictionary key = object name , value = Object
-	objects = dict()
-	#library of relations dictionary key = relation name , value = relation value
-	relations = dict()
-	#library with only the referenced objects
-	objectsLib = dict()
-	#library with only the referenced relations
-	relationsLib = dict()
+        model = False
+        folder = ""
+        #library of all objects dictionary key = object name , value = Object
+        objects = dict()
+        #library of relations dictionary key = relation name , value = relation value
+        relations = dict()
+        #library with only the referenced objects
+        objectsLib = dict()
+        #library with only the referenced relations
+        relationsLib = dict()
 
-	@staticmethod
-	def dupe_checking_hook(pairs):
+        @staticmethod
+        def dupe_checking_hook(pairs):
                 result = dict()
                 for key,val in pairs:
                         try:
@@ -33,8 +33,8 @@ class Object:
         
 	#finds the Object with the given name
 	#TODO handle "Error 03: the object xx is not defined !"
-	@staticmethod	
-	def findObject(name):
+        @staticmethod	
+        def findObject(name):
                 try:
                         if name in Object.objects.keys() :
                                 return Object.objects[name]
@@ -45,9 +45,9 @@ class Object:
                         e.toStr()
 					
 	#finds the relation with the given name	
-    #TODO handle "Error 04:the relation xx is not defined !"
-	@staticmethod
-	def findRelation(name):
+        #TODO handle "Error 04:the relation xx is not defined !"
+        @staticmethod
+        def findRelation(name):
                 try:
                         if name in Object.relations.keys() :
                                 return Object.relations[name]
@@ -57,34 +57,36 @@ class Object:
                 except error as e:
                         e.toStr()
 	
-	@staticmethod
-	def addObject(name,object):
-		Object.objects[name]=object
-	@staticmethod
-	def addRelation(name,value):
-		Object.relations[name]=value
+        @staticmethod
+        def addObject(name,object):
+                Object.objects[name]=object
+        @staticmethod
+        def addRelation(name,value):
+                Object.relations[name]=value
 
-	#handle "Error 02:the library file xx is not found!"
-	@staticmethod
-	def readLibrary(file):
-		try:
-			with open(Object.folder+file):
-				f=open(file,'r')        #open a file for reading
-				s=f.read()              #read the content of file f
+        #handle "Error 02:the library file xx is not found!"
+        @staticmethod
+        def readLibrary(file):
+                err_str=''
+                war_str=''
+                try:
+                        with open(Object.folder+file):
+                                f=open(file,'r')        #open a file for reading
+                                s=f.read()              #read the content of file f
                                 #To get rid of all the unmeaningful symbols after reading
-				s=s.replace("\n","")    #replace the string "\n" by ""
-				s=s.replace("\t","")    #replace the string "\t" by ""
-				s=" ".join(s.split())   #remove the duplicated spaces
+                                s=s.replace("\n","")    #replace the string "\n" by ""
+                                s=s.replace("\t","")    #replace the string "\t" by ""
+                                s=" ".join(s.split())   #remove the duplicated spaces
                                 #return a python object out of a json object
                                 #with object_pairs_hook method, we can check "Error 07" at the same level
-				target=json.loads(s,object_pairs_hook=Object.dupe_checking_hook)
+                                target=json.loads(s,object_pairs_hook=Object.dupe_checking_hook)
                                 #pprint.pprint(target)
-				f.close()
-				reldict=defaultdict(list)
-				err_str,war_str=Object.val_lib(file,target,target,True,[],[],reldict)
+                                f.close()
+                                reldict=defaultdict(list)
+                                err_str,war_str=Object.val_lib(file,target,target,True,[],[],reldict)
                                 #pprint.pprint(reldict)
                                 #print('\n'*2)
-				err_str+=Object.cycle_test(reldict,[],'',True)
+                                err_str+=Object.cycle_test(reldict,[],'',True)
 ##				for key in target.keys():	
 ##					if key == "objects":
 ##						for objectName in target[key].keys() :
@@ -101,10 +103,10 @@ class Object:
 ##						pass
 ##					else:
 ##						raise error("Error 08: field "+key+" in library is not recognised !")
-		except IOError:
+                except IOError:
                         print (IOError)
-                        print ('Error 02: library file is not found')
-		try:
+                        err_str+=('Error 02: library file is not found')
+                try:
                         if err_str!='':
                                 raise error(err_str)
                 except error as e:
@@ -114,7 +116,7 @@ class Object:
                                 raise warning(war_str)
                 except warning as w:
                         w.toStr()
-    
+##                return [err_str,war_str]
 
         #handle "Error 06:A cyclic dependency detected! The cycle is
         #"xx0-(include/extends)->xx1-(include/extends)->xx2-(include/extends)->..-(include/extends)->xx0"
@@ -174,10 +176,14 @@ class Object:
                         err_str+='Error 05:the [nature] of library '+tarname+' is not correct!\n'
                 elif target['nature'] !='object' and not islib:
                         err_str+='Error 05:the [nature] of object '+tarname+' is not correct!\n'
-                if 'extends' in target.keys() and target['extends'] != '' and 'objects' in target.keys():
-                        target.pop("objects",None)
-                        #print("after pop",target.keys())
-                        war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
+                if 'extends' in target.keys() and target['extends'] != '':
+                        if 'objects' in target.keys():
+                                target.pop("objects",None)
+                                #print("after pop",target.keys())
+                                war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
+                        if 'relations' in target.keys():
+                                target.pop("relations",None)
+                                war_str+='Warning 03: "relations" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
                 if 'objects' in target.keys() and target['objects'] != '':
                         for key in target['objects'].keys():    
                                 #with below, we can check "Error 07" at the different levels
@@ -223,6 +229,7 @@ class Object:
                                                 err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
                                 elif 'directional' in target['relations'][key] and target['relations'][key]['directional']!='':
                                         war_str+="Warning 03: [directional] in relation "+key+" will be overriden by that of relation "+target['relations'][key]['extends']+" as "+key+" extends "+target['relations'][key]['extends']+"\n"
+                                        target['relations'][key].pop("directional",None)
                 if islib:
                         for key in target.keys():
                                 if key not in ['nature','objects','relations']:
@@ -234,157 +241,144 @@ class Object:
 	#properties dictionary
 	#objects list of strings
 	#relations list of strings	
-	def __init__(self,name,parent,properties,objects,relations):
-		self.name = name
-		self.parent = parent
-		self.properties = properties
-		self.objects = objects
-		self.relations = relations
-		self.library = None
-	
-	def __init__(self,name,nested_json):
-		self.name = name
-		self.properties = dict()
-		self.relations = []		
-		self.library = None
-		if "library" in nested_json.keys():
-			self.library = nested_json['library']		
-		if 'properties' in nested_json.keys():
-			newProperties = nested_json["properties"]
-			for prop in newProperties.keys():
-				self.properties[prop] = newProperties[prop]			
-		#objects must be an array
-		if 'extends' in nested_json.keys():
-			self.parent = nested_json["extends"]
-			par = Object.findObject(self.parent)
-			self.inherit(par)
-		else :
-			self.parent = ""
-		self.objects = []
-		if 'objects' in nested_json.keys():
-			for objName in nested_json['objects'].keys():
-				if nested_json['objects'][objName]:
-					object = Object(objName,nested_json['objects'][objName])
-					self.objects.append(objName)
-					Object.objects[objName] = object
-				else :  # case of empty str read from a file
-					f=open(Object.folder+objName+".rau",'r')        #open a file for reading
-					s=f.read()              #read the content of file f
-					#return a python object out of a json object
-					target=json.loads(s)
-					f.close()
-					object = Object(objName,target)
-					self.objects.append(objName)
-					Object.objects[objName] = object
-		#relations must be an array
-		if 'relations' in nested_json.keys():
-			for rel in nested_json['relations'] :
-				if not nested_json['relations'][rel] : # case of empty str read from a file
-					f=open(Object.folder+rel+".rau",'r')        #open a file for reading
-					s=f.read()              #read the content of file f
-					#return a python object out of a json object
-					target=json.loads(s)
-					f.close()
-					relation = Relation(rel,target)
-					self.objects.append(rel)
-					Object.relations[rel] = relation
-					self.relations.append(rel)
-				if isinstance(nested_json['relations'][rel], str) :
-					self.relations.append(rel)
-				else :
-					relation = Relation(rel,nested_json['relations'][rel])
-					Object.relations[rel] = relation					
-					self.relations.append(rel)
-			
-			
-	def inherit(self,parent):
-		if parent :
-			self.properties = dict()
-			self.objects = []
-			self.relations = []
-			if parent.properties:
-				for prop in parent.properties :
-					self.properties[prop] = parent.properties[prop]
-			if parent.objects:
-				for obj in parent.objects:
-					self.objects.append(obj)
-			if parent.relations:
-				for rel in parent.relations :
-					self.relations.append(rel)
-	
-	#returns a string representation of this object 
-	def toStr(self,indent):
-		output = indent + "Name : " + self.name +"\n"
-		if self.parent:
-			output += indent + "Extends : " + self.parent +"\n"
-		if self.properties:
-			output += indent + "Properties : \n" 		
-			for prop in self.properties.keys() :
-				output += indent+"\t" +prop +" : " + self.properties[prop] + "\n"	
-		if self.objects:
-			output += indent + "Objects : \n"
-			for objName in self.objects :
-				object = Object.findObject(objName)
-				output += object.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"
-		if self.relations:
-			output += indent + "Relations : \n"
-			for relName in self.relations :
-				relation = Object.findRelation(relName)
-				output += relation.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"		
-		return output
-		
-	#returns a JSON representation of this object  
-	def toJson(self,indent):
-		output = indent + "{\n" 		 
-		output += indent + "\"nature\" : " + "\"object\",\n"
-		if self.library:
-			output += indent + "\"library\" : " + "\""+self.library+"\",\n"
-		if self.parent:
-			output += indent + "\"extends\" : \"" + self.parent +"\",\n"
-		if self.objects:
-			output += indent + "\"objects\" : "+ indent +"{\n"
-			for objName in self.objects :
-				output += indent + "\t\"" + objName + "\" : "
-				object = Object.findObject(objName)
-				output += object.toJson(indent + "\t")
-				output += ",\n"
-			#erase last comma
-			output = output[:-2] + "\n"
-			output += indent  + "},\n"
-		if self.relations:
-			output += indent + "\t\"relations\" : {\n"
-			for rel in self.relations:
-				relation = Object.findRelation(rel)
-				output += relation.toJson(indent) + ",\n"
-			#erase last comma
-			output = output[:-2] + "\n"
-			output+="\t},\n"				
-		if self.properties:
-			output += indent + "\"properties\" : "+indent+"{\n"
-			for prop in self.properties.keys() :
-				output += indent+"\t" +"\""+prop +"\""+" : \"" + self.properties[prop] + "\",\n"
-			#erase last comma
-			output = output[:-2] + "\n"
-			output += indent  + "}\n"
-		else :
-			#erase last comma
-			output = output[:-2] + "\n"
-		output += indent + "}"
-		return output
-	
-	#no need for that function this is done when reading
-	def flatten():
-		pass
-		
-####################################################################################
-##################
-#To test val_lib#
-##################                
-##for i in ['1','2','3','4','5','6','7','8']:
-##    file='Test_python/Test_Error0'+i+'/lib'
-##    Object.readLibrary(file)
-##    print('*'*80+'\nTest_error0'+i+' finished!\n'+'*'*80+'\n')        
-##file="Test_python/Test_Warnings/lib"
-##Object.readLibrary(file)
-##print("Test_Warnings finished!\n")
-####################################################################################
+        def __init__(self,name,parent,properties,objects,relations):
+                self.name = name
+                self.parent = parent
+                self.properties = properties
+                self.objects = objects
+                self.relations = relations
+                self.library = None
+
+        def __init__(self,name,nested_json):
+                self.name = name
+                self.properties = dict()
+                self.relations = []		
+                self.library = None
+                if "library" in nested_json.keys():
+                        self.library = nested_json['library']		
+                if 'properties' in nested_json.keys():
+                        newProperties = nested_json["properties"]
+                        for prop in newProperties.keys():
+                                self.properties[prop] = newProperties[prop]			
+                #objects must be an array
+                if 'extends' in nested_json.keys():
+                        self.parent = nested_json["extends"]
+                        par = Object.findObject(self.parent)
+                        self.inherit(par)
+                else :
+                        self.parent = ""
+                self.objects = []
+                if 'objects' in nested_json.keys():
+                        for objName in nested_json['objects'].keys():
+                                if nested_json['objects'][objName]:
+                                        object = Object(objName,nested_json['objects'][objName])
+                                        self.objects.append(objName)
+                                        Object.objects[objName] = object
+                                else :  # case of empty str read from a file
+                                        f=open(Object.folder+objName+".rau",'r')        #open a file for reading
+                                        s=f.read()              #read the content of file f
+                                        #return a python object out of a json object
+                                        target=json.loads(s)
+                                        f.close()
+                                        object = Object(objName,target)
+                                        self.objects.append(objName)
+                                        Object.objects[objName] = object
+                #relations must be an array
+                if 'relations' in nested_json.keys():
+                        for rel in nested_json['relations'] :
+                                if not nested_json['relations'][rel] : # case of empty str read from a file
+                                        f=open(Object.folder+rel+".rau",'r')        #open a file for reading
+                                        s=f.read()              #read the content of file f
+                                        #return a python object out of a json object
+                                        target=json.loads(s)
+                                        f.close()
+                                        relation = Relation(rel,target)
+                                        self.objects.append(rel)
+                                        Object.relations[rel] = relation
+                                        self.relations.append(rel)
+                                if isinstance(nested_json['relations'][rel], str) :
+                                        self.relations.append(rel)
+                                else :
+                                        relation = Relation(rel,nested_json['relations'][rel])
+                                        Object.relations[rel] = relation					
+                                        self.relations.append(rel)
+                        
+                        
+        def inherit(self,parent):
+                if parent :
+                        self.properties = dict()
+                        self.objects = []
+                        self.relations = []
+                        if parent.properties:
+                                for prop in parent.properties :
+                                        self.properties[prop] = parent.properties[prop]
+                        if parent.objects:
+                                for obj in parent.objects:
+                                        self.objects.append(obj)
+                        if parent.relations:
+                                for rel in parent.relations :
+                                        self.relations.append(rel)
+
+        #returns a string representation of this object 
+        def toStr(self,indent):
+                output = indent + "Name : " + self.name +"\n"
+                if self.parent:
+                        output += indent + "Extends : " + self.parent +"\n"
+                if self.properties:
+                        output += indent + "Properties : \n" 		
+                        for prop in self.properties.keys() :
+                                output += indent+"\t" +prop +" : " + self.properties[prop] + "\n"	
+                if self.objects:
+                        output += indent + "Objects : \n"
+                        for objName in self.objects :
+                                object = Object.findObject(objName)
+                                output += object.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"
+                if self.relations:
+                        output += indent + "Relations : \n"
+                        for relName in self.relations :
+                                relation = Object.findRelation(relName)
+                                output += relation.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"		
+                return output
+                
+        #returns a JSON representation of this object  
+        def toJson(self,indent):
+                output = indent + "{\n" 		 
+                output += indent + "\"nature\" : " + "\"object\",\n"
+                if self.library:
+                        output += indent + "\"library\" : " + "\""+self.library+"\",\n"
+                if self.parent:
+                        output += indent + "\"extends\" : \"" + self.parent +"\",\n"
+                if self.objects:
+                        output += indent + "\"objects\" : "+ indent +"{\n"
+                        for objName in self.objects :
+                                output += indent + "\t\"" + objName + "\" : "
+                                object = Object.findObject(objName)
+                                output += object.toJson(indent + "\t")
+                                output += ",\n"
+                        #erase last comma
+                        output = output[:-2] + "\n"
+                        output += indent  + "},\n"
+                if self.relations:
+                        output += indent + "\t\"relations\" : {\n"
+                        for rel in self.relations:
+                                relation = Object.findRelation(rel)
+                                output += relation.toJson(indent) + ",\n"
+                        #erase last comma
+                        output = output[:-2] + "\n"
+                        output+="\t},\n"				
+                if self.properties:
+                        output += indent + "\"properties\" : "+indent+"{\n"
+                        for prop in self.properties.keys() :
+                                output += indent+"\t" +"\""+prop +"\""+" : \"" + self.properties[prop] + "\",\n"
+                        #erase last comma
+                        output = output[:-2] + "\n"
+                        output += indent  + "}\n"
+                else :
+                        #erase last comma
+                        output = output[:-2] + "\n"
+                output += indent + "}"
+                return output
+
+        #no need for that function this is done when reading
+        def flatten():
+                pass

@@ -23,7 +23,7 @@
 				"nature":"object",
 				"extends":"Team1",
 				"objects":{"Student3":{"nature":"object", "extends":"Student"},"Student4":{"nature":"object", "extends":"Student"}},
-				"relations":{"Playwith1":{"nature":"relation","extends":"collaboration","directional":"false","from":"Student3","to":"Student4"}},		
+				"relations":{"Playwith1":{"nature":"relation","extends":"collaboration","from":"Student3","to":"Student4"}},		
 				"library":"lib"		
 				}
 		},
