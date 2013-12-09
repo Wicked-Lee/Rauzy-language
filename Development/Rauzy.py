@@ -91,7 +91,6 @@ def toFile(folder):
 
 
 #handle "Error 01: xx in the xx not defined!"
-#handle "Error 04:the relation xx is not defined !"
 #handle "Error 05:the nature of xx != correct!"
 #handle "Error 07:Redundant definition of xx!"
 #handle "Warning 02:Detect of a library member in xx, but xx is not the root object."
@@ -104,7 +103,7 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
     err_str=""
     war_str=""
     if 'nature' not in target.keys() or target['nature']=='':
-        err_str+='Error01: the field [nature] is not defined in the object '+tarname+'!\n'
+        err_str+='Error 01: the field [nature] is not defined in the object '+tarname+'!\n'
     elif target["nature"] != "object":
         err_str+='Error 05:the nature of object '+tarname+' is not correct!\n'
     if 'extends' in target.keys() and target['extends'] != '' and 'objects' in target.keys():
@@ -124,15 +123,15 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
     if 'relations' in target.keys() and target['relations'] != '' and isroot:
         for key in target['relations'].keys():
             if 'nature' not in target['relations'][key]:
-                err_str+='Error01: the field [nature] is not defined in root[relations]'+key+']\n'
+                err_str+='Error 01: the field [nature] is not defined in root[relations]'+key+']\n'
             elif target['relations'][key]['nature'] != 'relation':
                 err_str+='Error 05:the nature of'+tarname+'[relations]['+key+'] is not correct!\n'
             if 'from' not in target['relations'][key]:
-                err_str+='Error01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
+                err_str+='Error 01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
             if 'to' not in target['relations'][key]:
-                err_str+='Error01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
+                err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
             if not ('extends' in target['relations'][key] and target['relations'][key]['extends']!='') and 'directional' not in target['relations'][key]:
-                err_str+='Error01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
+                err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
     if 'library' in target.keys() and target['library']!='' and not isroot:
         war_str+='Warning 02:Detect of a library member in'+tarname+',but '+tarname+' is not the root object\n'
     return err_str,war_str                    
