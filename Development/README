@@ -1,0 +1,17 @@
+1.Checklist of deliverables
+Our product “Rauzy-Language” provides python-based tools to build, show, modify and export a system model. The complete package should include:
+
+1)Python programs
+Under the main repository, there are five python source files (Rauzy.py, Object.py, Relation.py, error.py and warning.py). Rauzy.py contains the main programs to execute while the other four contain separately four classes. The user should execute Rauzy.py to load the language environment and to be able to use defined functions. The python version should be python3.0 or later versions.
+
+2)User manual
+Under the "doc" repository, there is a user manual which explains the system models, the function details of the language and which provides un tutorial as well to users.
+
+3)Models
+Under the "lib" repository, there are predifined models to demonstrate the system modeling format and to test all the possibles errors and warnings.
+
+2.Usage:
+1)Put the system model and the library model under the main repository
+2)Execute Rauzy.py 
+3)Use predifined functions to show, modify and export the system model in the terminal
+Note:After 2), the user can use the command line "RauLang --help" for informations on the language functions
