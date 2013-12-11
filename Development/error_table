@@ -1,4 +1,5 @@
 Error_table:
+
 1.(val_root,val_lib)Absence of mandatory keys."Error 01: xx in the xx not defined!"
     a)For a Rauzy object, such members are mandatory:"nature"
     b)For a rauzy relation, such members are mandatory:"nature","from" and "to"(not for the relations in the library), "directional"(not for a root relation extending another relation)
@@ -9,10 +10,10 @@ Error_table:
 3.(findObject,)There is no object associated with a string xx when we want to extend an object in the library from the library or when we want to extend an object in the library from the root object or when we want to refer to an object defined in "objects" of the root object from the "relations" of the root object. "Error 03:the object xx is not defined !"
     Note:the name is case sensitive
 
-4.(findRelation)There is no relation associated with a string xx when we want to extends a relation in the "relations" of the library from the "objects" of the library or when we want to extend a relation in the library from the "relations" of the root object. "Error 04:the relation xx is not defined !"
+4.(findRelation)There is no relation associated with a string xx when we want to extends a relation in the "relations" of the library from the "objects" of the library or when we want to extend a relation in the library from the "relations" of the root object. "Error 04:the relation xx is not defined!"
     Note:the name is case sensitive
 
-5.(val_root,val_lib)The "nature" domain isn't correct. "Error 05:the nature of xx is not correct!"
+5.(val_root,val_lib)The "nature" domain is not correct. "Error 05:the nature of xx is not correct!"
 
 6.(val_lib)The presence of cyclic dependency in the library."Error 06:A cyclic dependency detected! The cycle is xx0-(include)->xx1-(extends)->xx2-(include)->..-(extends)->xx0."
 
