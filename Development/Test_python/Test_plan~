@@ -55,4 +55,3 @@ a)In bank[objects][Employer1], there is "objects" field as well as "extends" fie
 b)In lib[objects][Team2], there are "objects" and "relations" field as well as "extends" field
 c)In lib[objects][Team1][Playwith], there is 'directional' field as well as 'extends' field
 
-Warning 04:"[directional] in relation A will be overriden by that of relation B as A extends B"
