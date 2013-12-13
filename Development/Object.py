@@ -26,6 +26,7 @@ class Object:
                 try:
                         if key in result:
                                 raise error('Error 07:Redundant definition of '+key+'!\n')
+#TODO Here I can give result a field "Error 07":"Redundant definition of "+key+ "!\n"
                         result[key] = val
                 except error as e:
                         e.toStr()
@@ -35,26 +36,34 @@ class Object:
 #TODO handle "Error 03: the object xx is not defined !"
     @staticmethod
     def findObject(name):
-        try:
-            if name in Object.objects.keys() :
-                return Object.objects[name]
-            elif Object.model:
-                raise error("Error 033: the object "+name+" is not defined !")
-        except error as e:
-            e.toStr()
+        if name in Object.objects.keys() :
+            return Object.objects[name]
+
+##                return Object.objects[name]
+
+##        try:
+##            if name in Object.objects.keys() :
+##                return Object.objects[name]
+##            elif Object.model:
+##                raise error("Error 033: the object "+name+" is not defined !")
+##        except error as e:
+##            e.toStr()
 
 #finds the relation with the given name
 #TODO handle "Error 04:the relation xx is not defined !"
     @staticmethod
     def findRelation(name):
-        try:
-                if name in Object.relations.keys() :
-                        return Object.relations[name]
-                else:
-                        if Object.model:
-                                raise error("Error 044:the relation "+name+" is not defined !")
-        except error as e:
-                e.toStr()
+        if name in Object.relations.keys() :
+            return Object.relations[name]
+
+##        try:
+##                if name in Object.relations.keys() :
+##                        return Object.relations[name]
+##                else:
+##                        if Object.model:
+##                                raise error("Error 044:the relation "+name+" is not defined !")
+##        except error as e:
+##                e.toStr()
 
     @staticmethod
     def addObject(name,object):
@@ -68,6 +77,10 @@ class Object:
     def readLibrary(file):
         err_str=''
         war_str=''
+        list_obj=[]
+        list_rel=[]
+        ext_obj=[]
+        ext_rel=[]
         try:
             with open(Object.folder+file):
                 f=open(file,'r')        #open a file for reading
@@ -82,10 +95,11 @@ class Object:
                 #pprint.pprint(target)
                 f.close()
                 reldict=defaultdict(list)
-                err_str,war_str=Object.val_lib(file,target,target,True,[],[],reldict)
+                err_str,war_str=Object.val_lib(file,target,target,True,list_obj,list_rel,reldict,ext_obj,ext_rel)
                 #pprint.pprint(reldict)
                 #print('\n'*2)
                 err_str+=Object.cycle_test(reldict,[],'',True)
+                err_str+=Object.notdefined(list_obj,list_rel,ext_obj,ext_rel)
 ##				for key in target.keys():
 ##					if key == "objects":
 ##						for objectName in target[key].keys() :
@@ -103,8 +117,9 @@ class Object:
 ##					else:
 ##						raise error("Error 08: field "+key+" in library is not recognised !")
         except IOError:
-            err_str+=('Error 02: library file is not found')
-        return [err_str,war_str]
+            err_str+=('Error 02: library file is not found!\n')
+            list_obj=['Error 02']
+        return [err_str,war_str,list_obj,list_rel]
 #		try:
 #			if err_str!='':
 #				raise error(err_str)
@@ -116,9 +131,27 @@ class Object:
 #		except warning as w:
 #				w.toStr()
 
+    ##handle "Error 03: the object xx is not defined !"
+    ##handle "Error 04:the relation xx is not defined !"
+    @staticmethod
+    def notdefined(list_obj,list_rel,ext_obj,ext_rel):
+##        print('List of objects',list_obj)
+##        print('List of relations',list_rel)
+##        print('List of extended objects',ext_obj)
+##        print('List of extended relations',ext_rel)
+        err_str=''
+        if ext_obj is not []:
+            for obj in ext_obj:
+                if obj not in list_obj:
+                    err_str+='Error 03: the object '+obj+ ' extended in the lib is not defined !\n'
+        if ext_rel is not []:
+            for rel in ext_rel:
+                if rel not in list_rel:
+                    err_str+='Error 04:the relation '+rel+' extended in the lib is not defined !\n'
+        return err_str
 
-        #handle "Error 06:A cyclic dependency detected! The cycle is
-        #"xx0-(include/extends)->xx1-(include/extends)->xx2-(include/extends)->..-(include/extends)->xx0"
+    #handle "Error 06:A cyclic dependency detected! The cycle is
+    #"xx0-(include/extends)->xx1-(include/extends)->xx2-(include/extends)->..-(include/extends)->xx0"
     @staticmethod
     def cycle_test(ct,tr,node,isroot):
         err_str=''
@@ -152,12 +185,14 @@ class Object:
 #handle "Warning 01:xx should not be defined in a libray relation."
 #handle "Warning 03: 'objects' and 'relations' in object A will be overriden by these of object B as A extends B"
     @staticmethod
-    def val_lib(tarname,lib,target,islib,list_obj,list_rel,rd):
+    def val_lib(tarname,lib,target,islib,list_obj,list_rel,rd,ext_obj,ext_rel):
         err_str=""
         war_str=""
         if not islib:
             if 'extends' in target and target['extends']!='':
                 rd[tarname].append(target['extends'])
+                if target['extends'] not in ext_obj:
+                    ext_obj.append(target['extends'])
             elif 'objects' in target and target['objects']!='':
                 for key in target['objects'].keys():
                     rd[tarname].append(key)
@@ -181,13 +216,13 @@ class Object:
                     err_str+='Error 07:Redundant definition of object '+key+'!\n'
                 else:
                     list_obj.append(key)
-                valstr=Object.val_lib(key,lib,target['objects'][key],False,list_obj,list_rel,rd)
+                valstr=Object.val_lib(key,lib,target['objects'][key],False,list_obj,list_rel,rd,ext_obj,ext_rel)
                 err_str+=valstr[0]
                 war_str+=valstr[1]
         if islib and 'relations' in target and target['relations']!='':
             for key in target['relations'].keys():
                 if 'nature' not in target['relations'][key]:
-                    err_str+='Error01: the field [nature] is not defined in'+tarname+'[relations]['+key+']\n'
+                    err_str+='Error 01: the field [nature] is not defined in'+tarname+'[relations]['+key+']\n'
                 elif target['relations'][key]['nature'] != 'relation':
                     err_str+='Error 05:the [nature] of'+tarname+'[relations]['+key+'] is not correct!\n'
                 if 'from' in target['relations'][key]:
@@ -198,6 +233,10 @@ class Object:
                     err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
         if not islib and 'relations' in target and target['relations']!='':
             for key in target['relations'].keys():
+                if 'extends' in target['relations'][key] and target['relations'][key]['extends']!='':
+                        string=target['relations'][key]['extends']
+                        if string !='' and string not in ext_rel:
+                            ext_rel.append(string)
                 #with below, we can check "Error 07" at the different levels
                 if key in list_rel:
                     err_str+='Error 07:Redundant definition of relation '+key+'!\n'
@@ -218,6 +257,13 @@ class Object:
                     war_str+="Warning 03: [directional] in relation "+key+" will be overriden by that of relation "+target['relations'][key]['extends']+" as "+key+" extends "+target['relations'][key]['extends']+"\n"
                     target['relations'][key].pop("directional",None)
         if islib:
+            if 'relations' in target.keys() and target['relations']!='':
+                for key_rel in target['relations'].keys():
+                    list_rel.append(key_rel)
+                    if 'extends' in target['relations'][key_rel] and target['relations'][key_rel]['extends']!='':
+                        string=target['relations'][key_rel]['extends']
+                        if string !='' and string not in ext_rel:
+                            ext_rel.append(string)
             for key in target.keys():
                 if key not in ['nature','objects','relations']:
                     err_str+="Error 08:Incorrect library file format: ["+key+"] not recognized!\n"

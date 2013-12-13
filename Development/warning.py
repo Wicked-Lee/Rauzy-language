@@ -6,4 +6,4 @@ class warning(Exception):
     #the fonction to print the warning message
     def toStr(self):
         print(self.msg)
-        
+

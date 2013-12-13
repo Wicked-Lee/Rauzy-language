@@ -34,10 +34,12 @@ def parse(file):
 ##                folders = file.split("/")
 ##                for i in range(0,len(folders)-1):
 ##                        Object.folder += folders[i] +"/"
-
+##
         #open and then read the file
         err_str=''
         war_str=''
+        list_obj=[]
+        list_rel=[]
         f=open(file,'r')        #open a file for reading
         s=f.read()              #read the content of file f
         #return a python object out of a json object
@@ -52,21 +54,23 @@ def parse(file):
                 valstr=Object.readLibrary(lib)
                 err_str+=valstr[0]
                 war_str+=valstr[1]
+                list_obj=valstr[2]
+                list_rel=valstr[3]
 ##                Object.readLibrary(target['library'])
 ##                valstr=Object.readLibrary(target['library'])
 ##                err_str+=valstr[0]
 ##                war_str+=valstr[1]
         f.close()
         #To handle all the jason file format errors and warnings
-        valstr2=val_root(file,target,True,[],[])
+        valstr2=val_root(file,target,True,list_obj,list_rel)
         err_str+=valstr2[0]
         war_str+=valstr2[1]
         try:
                 if err_str != "":
-                        print ('There are errors!\n')
+                        ##print ('There are errors!\n')
                         raise error(err_str)
                 else:
-                        print('a model will be constructed!\n')
+                        ##print('a model will be constructed!\n')
                         Object.model = True
                         Relation.model = True
                         model = Object(file.split(".")[0],target)
@@ -116,10 +120,13 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
         err_str+='Error 01: the field [nature] is not defined in the object '+tarname+'!\n'
     elif target["nature"] != "object":
         err_str+='Error 05:the nature of object '+tarname+' is not correct!\n'
-    if 'extends' in target.keys() and target['extends'] != '' and 'objects' in target.keys():
-        target.pop("objects",None)
-        #print("after pop",target.keys())
-        war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
+    if 'extends' in target.keys() and target['extends'] != '':
+        if target['extends'] not in list_obj and 'Error 02' not in list_obj:
+            err_str+=("Error 03: the object "+target['extends']+" is not defined !\n")
+        if 'objects' in target.keys():
+            target.pop("objects",None)
+            #print("after pop",target.keys())
+            war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
     if 'objects' in target.keys() and target['objects'] != '':
         for key in target['objects'].keys():
             #with below, we can check "Error 07" at the different levels
@@ -130,7 +137,8 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
             valstr=val_root(key,target['objects'][key],False,list_obj,list_rel)
             err_str+=valstr[0]
             war_str+=valstr[1]
-    if 'relations' in target.keys() and target['relations'] != '' and isroot:
+    if isroot and 'relations' in target.keys() and target['relations'] != '':
+        ##print('List of relations:\n',list_rel)
         for key in target['relations'].keys():
             if 'nature' not in target['relations'][key]:
                 err_str+='Error 01: the field [nature] is not defined in root[relations]'+key+']\n'
@@ -140,8 +148,11 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
                 err_str+='Error 01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
             if 'to' not in target['relations'][key]:
                 err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
-            if not ('extends' in target['relations'][key] and target['relations'][key]['extends']!='') and 'directional' not in target['relations'][key]:
-                err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
+            if 'extends' in target['relations'][key] and target['relations'][key]['extends']!='':
+                if target['relations'][key]['extends'] not in list_rel and 'Error 02' not in list_obj:
+                    err_str+=("Error 04: the relation "+target['relations'][key]['extends']+" is not defined !\n")
+            elif 'directional' not in target['relations'][key]:
+                    err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
     if 'library' in target.keys() and target['library']!='' and not isroot:
         war_str+='Warning 02:Detect of a library member in'+tarname+',but '+tarname+' is not the root object\n'
     return err_str,war_str
@@ -203,6 +214,9 @@ for i in ['1','2','3','4','5','6','7','8']:
 file="Test_python/Test_Warnings/Bank.rau"
 target=parse(file)
 print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')
+##file='Test_python/Test_Warnings/Bank.rau'
+##target=parse(file)
+##print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')
 ################################################################################
 ####################################################################################
 ##################

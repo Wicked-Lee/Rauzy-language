@@ -12,6 +12,11 @@
 				  "nature":"object",
 				  "extends":"Human",
 				  "properties":{"university":"unknown","age":"unknown","ISIC_number":"unknown"}
+				},
+			"Team":{
+				"nature":"object",
+				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student2":{"nature":"object", "extends":"Student"}},
+				"relations":{"Playwith":{"nature":"relation","directional":true,"from":["Student0"],"to":["Student2"]}}				
 				}
 		},
 	"relations":

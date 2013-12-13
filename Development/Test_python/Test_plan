@@ -13,13 +13,14 @@ Test_Error 02:"the library file xx is not found!"
 a)The file "lib" is in not in the same library as "bank.rau"
 
 Test_Error 03:"the object xx is not defined !"
-a)TODO bank[objects][Customer 1] extends "Human" while in "lib" it is "human"
+a)bank[objects][Customer 1] and [Employer1] extends "Human" while in "lib" it is "human"
 b)lib[objects][Student] extends "Human" while in "lib" it is "human"
 c)TODO bank[relations][owns][to] contends "Account 1" while in bank[objects] we have "Account1"
+d)TODO lib[objects][Team][relations][playwith][from] contends "Student0" while we don't have this term
 
 Test_Error 04:"the relation xx is not defined !"
 a)lib[objects][Team][relations][playwith] extends "COllaboration" while in lib[relations] we have "collaboration"
-b)TODO bank[relations][owns] extends "ownership1" while in lib[relations] we have "ownership"
+b)bank[relations][owns] extends "ownership1" while in lib[relations] we have "ownership"
 
 Test_Error 05:"the nature of xx is not correct!"
 a)In bank[objects][Customer1][nature] is "OBject", but "object" expected

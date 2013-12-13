@@ -6,4 +6,4 @@ class error(Exception):
     #the fonction to print the error message
     def toStr(self):
         print(self.msg)
-        
+

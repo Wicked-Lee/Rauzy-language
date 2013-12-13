@@ -14,4 +14,4 @@ Under the "lib" repository, there are predifined models to demonstrate the syste
 1)Put the system model and the library model under the main repository
 2)Execute Rauzy.py 
 3)Use predifined functions to show, modify and export the system model in the terminal
-Note:After 2), the user can use the command line "RauLang --help" for informations on the language functions
+Note:After 2), the user can use the command line "help" for informations on the language functions

@@ -11,9 +11,6 @@ class Relation:
 	def findRelation(name):
 		if name in Relation.relations.keys() :
 			return Relation.relations[name]
-		else:
-			if Relation.model:
-				raise error("Error 04:the relation "+name+" is not defined !")
 	
 	def __init__(self,name,parent,sources,targets,directional):
 		self.name = name
