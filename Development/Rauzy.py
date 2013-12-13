@@ -21,7 +21,7 @@ def parse(file):
 ##    Object.folder = ""
 ##	Object.model = False
 ##	Relation.model = False
-##	model = None
+	model = None
 ##    print ('type \'help\' for help')
 ##    input = raw_input('>>')
 ##    while(input!='exit') :
@@ -70,7 +70,7 @@ def parse(file):
                         ##print ('There are errors!\n')
                         raise error(err_str)
                 else:
-                        ##print('a model will be constructed!\n')
+                        print('a model will be constructed!\n')
                         Object.model = True
                         Relation.model = True
                         model = Object(file.split(".")[0],target)
@@ -82,7 +82,7 @@ def parse(file):
         except warning as w:
                 w.toStr()
     #TO return the constructed model
-##	return model
+	return model
 
 #writes the necessary files for this model
 #One file for root object
@@ -159,61 +159,61 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
 
 #prints the model in screen
 def printModel():
-    print (Model)
+    #print (Model)
     print (model.toStr(""))
 
 
 #root Object
 #model = parse("Bank.rau")
-#model = None
-#print ('type \'help\' for help')
-#input = raw_input('>>')
-#while(input!='exit') :
-#	if input.startswith('read'):
-#		Object.objects = dict()
-#		Object.relations = dict()
-#		Object.objectsLib = dict()
-#		Object.relationsLib = dict()
-#		if len(input.split()) != 2:
-#			print ('usage: read <file name>')
-#		else :
-#			file = input.split()[1]
-#			if not os.path.exists(file):
-#				print ('file \'' + file + '\' does not exist!')
-#			else:
-#				model = parse(file)
-#	elif input == "help":
-#		print ("Available commands")
-#		print ('read <file name> \t to load a model')
-#		print ('save <folder name> \t to save the model in a file')
-#		print ('print \t\t\t to print the model in the screen')
-#		print ('exit \t\t\t to exit')
-#	elif input == 'print':
-#		if model:
-#			printModel()
-#		else:
-#			print ('No model has been loaded')
-#	elif input.startswith('save'):
-#		if len(input.split()) != 2:
-#			print ('usage: save <folder name>')
-#		else:
-#			folder = input.split()[1]
-#			toFile(folder)
-#	else :
-#		print ('type \'help\' for help')
-#	input = raw_input('>>')
+model = None
+print ('type \'help\' for help')
+input = raw_input('>>')
+while(input!='exit') :
+	if input.startswith('read'):
+		Object.objects = dict()
+		Object.relations = dict()
+		Object.objectsLib = dict()
+		Object.relationsLib = dict()
+		if len(input.split()) != 2:
+			print ('usage: read <file name>')
+		else :
+			file = input.split()[1]
+			if not os.path.exists(file):
+				print ('file \'' + file + '\' does not exist!')
+			else:
+				model = parse(file)
+	elif input == "help":
+		print ("Available commands")
+		print ('read <file name> \t to load a model')
+		print ('save <folder name> \t to save the model in a file')
+		print ('print \t\t\t to print the model in the screen')
+		print ('exit \t\t\t to exit')
+	elif input == 'print':
+		if model:
+			printModel()
+		else:
+			print ('No model has been loaded')
+	elif input.startswith('save'):
+		if len(input.split()) != 2:
+			print ('usage: save <folder name>')
+		else:
+			folder = input.split()[1]
+			toFile(folder)
+	else :
+		print ('type \'help\' for help')
+	input = raw_input('>>')
 
 ####################################################################################
 ##################
 #To test val_root#
 ##################
-for i in ['1','2','3','4','5','6','7','8']:
-    file='Test_python/Test_Error0'+i+'/Bank.rau'
-    target=parse(file)
-    print('*'*80+'\nTest_error0'+i+' finished!\n'+'*'*80+'\n')
-file="Test_python/Test_Warnings/Bank.rau"
-target=parse(file)
-print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')
+#for i in ['1','2','3','4','5','6','7','8']:
+#    file='Test_python/Test_Error0'+i+'/Bank.rau'
+#    target=parse(file)
+#    print('*'*80+'\nTest_error0'+i+' finished!\n'+'*'*80+'\n')
+#file="Test_python/Test_Warnings/Bank.rau"
+#target=parse(file)
+#print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')
 ##file='Test_python/Test_Warnings/Bank.rau'
 ##target=parse(file)
 ##print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')

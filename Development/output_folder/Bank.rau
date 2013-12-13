@@ -1,0 +1,49 @@
+{
+"nature" : "object",
+"library" : "lib",
+"objects" : {
+	"Customer1" : 	{
+	"nature" : "object",
+	"extends" : "Human",
+	"properties" : 	{
+		"lastname" : "Papoutsakis",
+		"name" : "Georgios"
+	}
+	},
+	"Employer1" : 	{
+	"nature" : "object",
+	"extends" : "Human",
+	"properties" : 	{
+		"salary" : "20000",
+		"lastname" : "Papadopoulos",
+		"worksIn" : "frontdesk",
+		"name" : "Kostas"
+	}
+	},
+	"Account1" : 	{
+	"nature" : "object",
+	"properties" : 	{
+		"amount" : "30000",
+		"Id" : "AB325E"
+	}
+	}
+},
+	"relations" : {
+	"HasOwner" : {
+		"nature" : "relation",
+		"sources" : ["Account1"],
+		"targets" : ["Customer1"],
+		"directional" : false
+		},
+	"owns" : {
+		"nature" : "relation",
+		"sources" : ["Customer1"],
+		"targets" : ["Account1"],
+		"directional" : true
+		}
+	},
+"properties" : {
+	"name" : "bnp Parisbas",
+	"address" : "a"
+}
+}
