@@ -81,6 +81,7 @@ class Object:
         list_rel=[]
         ext_obj=[]
         ext_rel=[]
+        dict_ft=defaultdict(list)
         try:
             with open(Object.folder+file):
                 f=open(file,'r')        #open a file for reading
@@ -95,11 +96,11 @@ class Object:
                 #pprint.pprint(target)
                 f.close()
                 reldict=defaultdict(list)
-                err_str,war_str=Object.val_lib(file,target,target,True,list_obj,list_rel,reldict,ext_obj,ext_rel)
+                err_str,war_str=Object.val_lib(file,target,target,True,list_obj,list_rel,reldict,ext_obj,ext_rel,dict_ft)
                 #pprint.pprint(reldict)
                 #print('\n'*2)
                 err_str+=Object.cycle_test(reldict,[],'',True)
-                err_str+=Object.notdefined(list_obj,list_rel,ext_obj,ext_rel)
+                err_str+=Object.notdefined(list_obj,list_rel,ext_obj,ext_rel,dict_ft)
 ##				for key in target.keys():
 ##					if key == "objects":
 ##						for objectName in target[key].keys() :
@@ -134,7 +135,7 @@ class Object:
     ##handle "Error 03: the object xx is not defined !"
     ##handle "Error 04:the relation xx is not defined !"
     @staticmethod
-    def notdefined(list_obj,list_rel,ext_obj,ext_rel):
+    def notdefined(list_obj,list_rel,ext_obj,ext_rel,dict_ft):
 ##        print('List of objects',list_obj)
 ##        print('List of relations',list_rel)
 ##        print('List of extended objects',ext_obj)
@@ -148,6 +149,11 @@ class Object:
             for rel in ext_rel:
                 if rel not in list_rel:
                     err_str+='Error 04:the relation '+rel+' extended in the lib is not defined !\n'
+##        if dict_ft is not {}:
+##            for key in dict_ft.keys():
+##                if key not in list_obj and dict_ft[key]!=[]:
+##                    for tarname in dict_ft[key]:
+##                        err_str+='Error 03: the object '+key+ ' in '+tarname+' is not defined !\n'
         return err_str
 
     #handle "Error 06:A cyclic dependency detected! The cycle is
@@ -175,7 +181,57 @@ class Object:
         else:
             tr.remove(node)
         return err_str
-
+    #handle "Error 00: Json type xx expected in xx!"
+    #The rule is that following keys are defined keywords: 'nature', 'objects','relations','properties','library','extends','from','to','directional'
+    @staticmethod
+    def val_type(tarname,target):
+        err_str=''
+        if 'nature' in target and not isinstance(target['nature'],str):
+            err_str+='Error 00: Json type "string" expected in'+tarname+'[nature]! \n'
+        if 'objects' in target:
+            if isinstance(target['objects'],dict):
+                for key in target['objects'].keys():
+                    if not isinstance(key,str):
+                        err_str+='Error 00: Jason type "string" expected in the left value of '+tarname+' [objects]['+key+']! \n'
+                    if not isinstance(target['objects'][key],dict):
+                        err_str+='Error 00: Jason type "object" expected in the right value of '+tarname+'[objects]['+key+']! \n'
+            else:
+                err_str+='Error 00: Jason type "object" expected in'+tarname+'[objects]! \n'
+        if 'relations' in target:
+            if isinstance(target['relations'],dict):
+                for key in target['relations'].keys():
+                    if not isinstance(key,str):
+                        err_str+='Error 00: Jason type "string" expected in the left value of '+tarname+' [relations]['+key+']! \n'
+                    if not isinstance(target['relations'][key],dict):
+                        err_str+='Error 00: Jason type "object" expected in the right value of '+tarname+'[relations]['+key+']! \n'
+            else:
+                err_str+='Error 00: Jason type "object" expected in'+tarname+'[relations]! \n'
+        if 'extends' in target and isinstance(target['extends'],str):
+            err_str+='Error 00: Jason type "object" expected in'+tarname+'[extends]! \n'
+        if 'properties' in target:
+            if isinstance(target['properties'],dict):
+                    for key in target['properties'].keys():
+                        if not isinstance(key,str):
+                            err_str+='Error 00: Jason type "string" expected in the left value of '+tarname+' [properties]['+key+']! \n'
+            else:
+                err_str+='Error 00: Jason type "object" expected in'+tarname+'[properties]! \n'
+        if 'library' in target and isinstance(target['extends'],str):
+            err_str+='Error 00: Jason type "str" expected in'+tarname+'[library]! \n'
+        if 'from' in target:
+            if isinstance(target['from'],list):
+                    for element in target['from']:
+                        if not isinstance(element,str):
+                            err_str+='Error 00: Jason type "string" expected in '+tarname+' [from]['+elment+']! \n'
+            else:
+                err_str+='Error 00: Jason type "array" expected in'+tarname+'[from]! \n'
+        if 'to' in target:
+            if isinstance(target['to'],list):
+                    for element in target['to']:
+                        if not isinstance(element,str):
+                            err_str+='Error 00: Jason type "string" expected in '+tarname+' [to]['+elment+']! \n'
+            else:
+                err_str+='Error 00: Jason type "array" expected in'+tarname+'[to]! \n'
+        return err_str
 #handle "Error 01: xx in the xx not defined!"
 #handle "Error 03:the object xx is not defined !"
 #handle "Error 04:the relation xx is not defined !"
@@ -185,9 +241,11 @@ class Object:
 #handle "Warning 01:xx should not be defined in a libray relation."
 #handle "Warning 03: 'objects' and 'relations' in object A will be overriden by these of object B as A extends B"
     @staticmethod
-    def val_lib(tarname,lib,target,islib,list_obj,list_rel,rd,ext_obj,ext_rel):
+    def val_lib(tarname,lib,target,islib,list_obj,list_rel,rd,ext_obj,ext_rel,dict_ft):
         err_str=""
         war_str=""
+        ##Check the types
+        ##val_type(tarname,target)
         if not islib:
             if 'extends' in target and target['extends']!='':
                 rd[tarname].append(target['extends'])
@@ -216,7 +274,7 @@ class Object:
                     err_str+='Error 07:Redundant definition of object '+key+'!\n'
                 else:
                     list_obj.append(key)
-                valstr=Object.val_lib(key,lib,target['objects'][key],False,list_obj,list_rel,rd,ext_obj,ext_rel)
+                valstr=Object.val_lib(key,lib,target['objects'][key],False,list_obj,list_rel,rd,ext_obj,ext_rel,dict_ft)
                 err_str+=valstr[0]
                 war_str+=valstr[1]
         if islib and 'relations' in target and target['relations']!='':
@@ -246,10 +304,16 @@ class Object:
                     err_str+='Error 01: the field [nature] is not defined in lib['+tarname+'][relations]['+key+']\n'
                 elif target['relations'][key]['nature'] != 'relation':
                     err_str+='Error 05:the [nature] of'+tarname+'[relations]['+key+'] is not correct!\n'
-                if 'from' not in target['relations'][key]:
+                if 'from' not in target['relations'][key] or target['relations'][key]['from']==[]:
                     err_str+='Error 01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
-                if 'to' not in target['relations'][key]:
+                else:
+                    for obj in target['relations'][key]['from']:
+                        dict_ft[obj].append(tarname+'[relations]['+key+'][from]')
+                if 'to' not in target['relations'][key] or target['relations'][key]['to']==[]:
                     err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
+                else:
+                    for obj in target['relations'][key]['to']:
+                        dict_ft[obj].append(tarname+'[relations]['+key+'][to]')
                 if 'extends' not in target['relations'][key] or target['relations'][key]['extends']=='':
                     if 'directional' not in target['relations'][key] or target['relations'][key]=='':
                         err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'

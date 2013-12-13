@@ -16,6 +16,7 @@ Test_Error 03:"the object xx is not defined !"
 a)bank[objects][Customer 1] and [Employer1] extends "Human" while in "lib" it is "human"
 b)lib[objects][Student] extends "Human" while in "lib" it is "human"
 c)TODO bank[relations][owns][to] contends "Account 1" while in bank[objects] we have "Account1"
+d)TODO lib[objects][Team][relations][playwith][from] contends "Student0" while we don't have this term
 
 Test_Error 04:"the relation xx is not defined !"
 a)lib[objects][Team][relations][playwith] extends "COllaboration" while in lib[relations] we have "collaboration"
