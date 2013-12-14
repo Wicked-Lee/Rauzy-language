@@ -21,7 +21,7 @@ def parse(file):
 ##    Object.folder = ""
 ##	Object.model = False
 ##	Relation.model = False
-	model = None
+##	model = None
 ##    print ('type \'help\' for help')
 ##    input = raw_input('>>')
 ##    while(input!='exit') :
@@ -35,54 +35,54 @@ def parse(file):
 ##                for i in range(0,len(folders)-1):
 ##                        Object.folder += folders[i] +"/"
 ##
-        #open and then read the file
-        err_str=''
-        war_str=''
-        list_obj=[]
-        list_rel=[]
-        f=open(file,'r')        #open a file for reading
-        s=f.read()              #read the content of file f
-        #return a python object out of a json object
-        #with object_pairs_hook method, we can check "Error 07" at the same level
-        target=json.loads(s,object_pairs_hook=dupe_checking_hook)
-        if "library" in target.keys():
-                lib=''
-                folders=file.split("/")
-                for i in range(0,len(folders)-1):
-                        lib+=folders[i]+"/"
-                lib+="lib"
-                valstr=Object.readLibrary(lib)
-                err_str+=valstr[0]
-                war_str+=valstr[1]
-                list_obj=valstr[2]
-                list_rel=valstr[3]
+    #open and then read the file
+    err_str=''
+    war_str=''
+    list_obj=[]
+    list_rel=[]
+    f=open(file,'r')        #open a file for reading
+    s=f.read()              #read the content of file f
+    #return a python object out of a json object
+    #with object_pairs_hook method, we can check "Error 07" at the same level
+    target=json.loads(s,object_pairs_hook=dupe_checking_hook)
+    if "library" in target.keys():
+        lib=''
+        folders=file.split("/")
+        for i in range(0,len(folders)-1):
+                lib+=folders[i]+"/"
+        lib+="lib"
+        valstr=Object.readLibrary(lib)
+        err_str+=valstr[0]
+        war_str+=valstr[1]
+        list_obj=valstr[2]
+        list_rel=valstr[3]
 ##                Object.readLibrary(target['library'])
 ##                valstr=Object.readLibrary(target['library'])
 ##                err_str+=valstr[0]
 ##                war_str+=valstr[1]
-        f.close()
-        #To handle all the jason file format errors and warnings
-        valstr2=val_root(file,target,True,list_obj,list_rel)
-        err_str+=valstr2[0]
-        war_str+=valstr2[1]
-        try:
-                if err_str != "":
-                        ##print ('There are errors!\n')
-                        raise error(err_str)
-                else:
-                        print('a model will be constructed!\n')
-                        Object.model = True
-                        Relation.model = True
-                        model = Object(file.split(".")[0],target)
-        except error as e:
-                e.toStr()
-        try:
-                if war_str != "":
-                        raise warning(war_str)
-        except warning as w:
-                w.toStr()
+    f.close()
+    #To handle all the jason file format errors and warnings
+    valstr2=val_root(file,target,True,list_obj,list_rel)
+    err_str+=valstr2[0]
+    war_str+=valstr2[1]
+    try:
+        if err_str != "":
+            ##print ('There are errors!\n')
+            raise error(err_str)
+        else:
+            ##print('a model will be constructed!\n')
+            Object.model = True
+            Relation.model = True
+            model = Object(file.split(".")[0],target)
+    except error as e:
+        e.toStr()
+    try:
+        if war_str != "":
+            raise warning(war_str)
+    except warning as w:
+            w.toStr()
     #TO return the constructed model
-	return model
+##	return model
 
 #writes the necessary files for this model
 #One file for root object
@@ -144,10 +144,14 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
                 err_str+='Error 01: the field [nature] is not defined in root[relations]'+key+']\n'
             elif target['relations'][key]['nature'] != 'relation':
                 err_str+='Error 05:the nature of'+tarname+'[relations]['+key+'] is not correct!\n'
-            if 'from' not in target['relations'][key]:
+            if 'from' not in target['relations'][key] or target['relations'][key]['from']==[]:
                 err_str+='Error 01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
-            if 'to' not in target['relations'][key]:
+##            elif target['relations'][key]['from'] not in list_obj:
+##                err_str='Error 03: the object "+target['relations'][key]['from']+" in the field [from] is not defined !\n'
+            if 'to' not in target['relations'][key] or target['relations'][key]['to']==[]:
                 err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
+##            elif target['relations'][key]['to'] not in list_obj:
+##                err_str='Error 03: the object "+target['relations'][key]['to']+" in the field [to] is not defined !\n'
             if 'extends' in target['relations'][key] and target['relations'][key]['extends']!='':
                 if target['relations'][key]['extends'] not in list_rel and 'Error 02' not in list_obj:
                     err_str+=("Error 04: the relation "+target['relations'][key]['extends']+" is not defined !\n")
@@ -159,61 +163,61 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
 
 #prints the model in screen
 def printModel():
-    #print (Model)
+    print (Model)
     print (model.toStr(""))
 
 
 #root Object
 #model = parse("Bank.rau")
-model = None
-print ('type \'help\' for help')
-input = raw_input('>>')
-while(input!='exit') :
-	if input.startswith('read'):
-		Object.objects = dict()
-		Object.relations = dict()
-		Object.objectsLib = dict()
-		Object.relationsLib = dict()
-		if len(input.split()) != 2:
-			print ('usage: read <file name>')
-		else :
-			file = input.split()[1]
-			if not os.path.exists(file):
-				print ('file \'' + file + '\' does not exist!')
-			else:
-				model = parse(file)
-	elif input == "help":
-		print ("Available commands")
-		print ('read <file name> \t to load a model')
-		print ('save <folder name> \t to save the model in a file')
-		print ('print \t\t\t to print the model in the screen')
-		print ('exit \t\t\t to exit')
-	elif input == 'print':
-		if model:
-			printModel()
-		else:
-			print ('No model has been loaded')
-	elif input.startswith('save'):
-		if len(input.split()) != 2:
-			print ('usage: save <folder name>')
-		else:
-			folder = input.split()[1]
-			toFile(folder)
-	else :
-		print ('type \'help\' for help')
-	input = raw_input('>>')
+#model = None
+#print ('type \'help\' for help')
+#input = raw_input('>>')
+#while(input!='exit') :
+#	if input.startswith('read'):
+#		Object.objects = dict()
+#		Object.relations = dict()
+#		Object.objectsLib = dict()
+#		Object.relationsLib = dict()
+#		if len(input.split()) != 2:
+#			print ('usage: read <file name>')
+#		else :
+#			file = input.split()[1]
+#			if not os.path.exists(file):
+#				print ('file \'' + file + '\' does not exist!')
+#			else:
+#				model = parse(file)
+#	elif input == "help":
+#		print ("Available commands")
+#		print ('read <file name> \t to load a model')
+#		print ('save <folder name> \t to save the model in a file')
+#		print ('print \t\t\t to print the model in the screen')
+#		print ('exit \t\t\t to exit')
+#	elif input == 'print':
+#		if model:
+#			printModel()
+#		else:
+#			print ('No model has been loaded')
+#	elif input.startswith('save'):
+#		if len(input.split()) != 2:
+#			print ('usage: save <folder name>')
+#		else:
+#			folder = input.split()[1]
+#			toFile(folder)
+#	else :
+#		print ('type \'help\' for help')
+#	input = raw_input('>>')
 
 ####################################################################################
 ##################
 #To test val_root#
 ##################
-#for i in ['1','2','3','4','5','6','7','8']:
-#    file='Test_python/Test_Error0'+i+'/Bank.rau'
-#    target=parse(file)
-#    print('*'*80+'\nTest_error0'+i+' finished!\n'+'*'*80+'\n')
-#file="Test_python/Test_Warnings/Bank.rau"
-#target=parse(file)
-#print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')
+for i in ['1','2','3','4','5','6','7','8']:
+    file='Test_python/Test_Error0'+i+'/Bank.rau'
+    target=parse(file)
+    print('*'*80+'\nTest_error0'+i+' finished!\n'+'*'*80+'\n')
+file="Test_python/Test_Warnings/Bank.rau"
+target=parse(file)
+print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')
 ##file='Test_python/Test_Warnings/Bank.rau'
 ##target=parse(file)
 ##print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')
