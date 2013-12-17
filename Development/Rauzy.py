@@ -111,20 +111,17 @@ def toFile(folder):
 #handle "Warning 03: [objects] and [relations] in object A will be overriden by these of object B as A extends B"
 #tarname is name of the object(not necessarily the root object), target is the parsed file, "isroot" to signify the object is the root object or not
 def val_root(tarname,target,isroot,list_obj,list_rel):
-    #print(tarname,isroot)
-    #print(target.keys())
-    #keys=
+    #Type checking
     err_str=""
     war_str=""
+    err_str+=Object.val_type(tarname,target)
     if 'nature' not in target.keys() or target['nature']=='':
         err_str+='Error 01: the field [nature] is not defined in the object '+tarname+'!\n'
     elif target["nature"] != "object":
         err_str+='Error 05:the nature of object '+tarname+' is not correct!\n'
     if not isroot and 'extends' in target.keys() and target['extends'] != '':
-        #print(list_obj)
-        #print(target['extends'])
         if target['extends'] not in list_obj and 'Error 02' not in list_obj:
-            err_str+="Error 03: the object "+target['extends']+" extended in the .rau file is not defined !\n"
+            err_str+=("Error 03: the object "+target['extends']+"extended in the root file is not defined !\n")
         if 'objects' in target.keys():
             target.pop("objects",None)
             #print("after pop",target.keys())
@@ -152,12 +149,12 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
                 for fr in target['relations'][key]['from']:
                     if fr not in list_obj:
                         err_str+='Error 03: the object '+fr+' in the field '+tarname+'[relations]['+key+'][from] is not defined !\n'
-            if 'to' not in target['relations'][key] or target['relations'][key]==[]:
+            if 'to' not in target['relations'][key] or target['relations'][key]['to']==[]:
                 err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
             else:
                 for fr in target['relations'][key]['to']:
                     if fr not in list_obj:
-                        err_str+='Error 03: the object '+fr+' in the field '+tarname+'[relations]['+key+'][to] is not defined !\n'
+                        err_str+='Error 03: the object '+fr+' in the field '+tarname+'[relations]['+key+'][to] is not defined!\n'
             if 'extends' in target['relations'][key] and target['relations'][key]['extends']!='':
                 if target['relations'][key]['extends'] not in list_rel and 'Error 02' not in list_obj:
                     err_str+=("Error 04: the relation "+target['relations'][key]['extends']+" is not defined !\n")

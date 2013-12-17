@@ -10,7 +10,7 @@
 			"Employer1":{
 				"nature":"object",
 				"extends":"Human",
-				"objects":{"":""},
+				"objects":{"":{}},
 				"properties":{ 
 					"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"},
 				"library":"lib"

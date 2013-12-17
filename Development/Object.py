@@ -167,8 +167,10 @@ class Object:
     @staticmethod
     def val_type(tarname,target):
         err_str=''
+        #[nature] must be string
         if 'nature' in target and not isinstance(target['nature'],str):
             err_str+='Error 00: Json type "string" expected in'+tarname+'[nature]! \n'
+        #[objects] must be dict of dicts
         if 'objects' in target:
             if isinstance(target['objects'],dict):
                 for key in target['objects'].keys():
@@ -178,6 +180,7 @@ class Object:
                         err_str+='Error 00: Jason type "object" expected in the right value of '+tarname+'[objects]['+key+']! \n'
             else:
                 err_str+='Error 00: Jason type "object" expected in'+tarname+'[objects]! \n'
+        #[relations] must be dict of dicts
         if 'relations' in target:
             if isinstance(target['relations'],dict):
                 for key in target['relations'].keys():
@@ -187,8 +190,10 @@ class Object:
                         err_str+='Error 00: Jason type "object" expected in the right value of '+tarname+'[relations]['+key+']! \n'
             else:
                 err_str+='Error 00: Jason type "object" expected in'+tarname+'[relations]! \n'
-        if 'extends' in target and isinstance(target['extends'],str):
-            err_str+='Error 00: Jason type "object" expected in'+tarname+'[extends]! \n'
+        #[extends] must be string
+        if 'extends' in target and not isinstance(target['extends'],str):
+            err_str+='Error 00: Jason type "string" expected in'+tarname+'[extends]! \n'
+        #[properties] must be dict of string keys
         if 'properties' in target:
             if isinstance(target['properties'],dict):
                     for key in target['properties'].keys():
@@ -196,8 +201,10 @@ class Object:
                             err_str+='Error 00: Jason type "string" expected in the left value of '+tarname+' [properties]['+key+']! \n'
             else:
                 err_str+='Error 00: Jason type "object" expected in'+tarname+'[properties]! \n'
-        if 'library' in target and isinstance(target['extends'],str):
+        #[library] must be string
+        if 'library' in target and not isinstance(target['library'],str):
             err_str+='Error 00: Jason type "str" expected in'+tarname+'[library]! \n'
+        #[from] must be list of strings
         if 'from' in target:
             if isinstance(target['from'],list):
                     for element in target['from']:
@@ -205,6 +212,7 @@ class Object:
                             err_str+='Error 00: Jason type "string" expected in '+tarname+' [from]['+elment+']! \n'
             else:
                 err_str+='Error 00: Jason type "array" expected in'+tarname+'[from]! \n'
+        #[to] must be list of strings
         if 'to' in target:
             if isinstance(target['to'],list):
                     for element in target['to']:
@@ -226,7 +234,7 @@ class Object:
         err_str=""
         war_str=""
         ##Check the types
-        ##val_type(tarname,target)
+        err_str+=Object.val_type(tarname,target)
         if not islib:
             if 'extends' in target and target['extends']!='':
                 rd[tarname].append(target['extends'])
