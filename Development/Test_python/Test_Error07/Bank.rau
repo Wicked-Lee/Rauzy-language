@@ -28,7 +28,7 @@
 				 "nature" : "relation",
 				 "extends":"ownership",
 				 "from" : [ "Customer1" ],
-				 "to" : [ "Account1" ] 
+				 "to" : [ "Customer1" ] 
 			},
 		  "owns":
 			{

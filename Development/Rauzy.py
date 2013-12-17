@@ -35,52 +35,52 @@ def parse(file):
 ##                for i in range(0,len(folders)-1):
 ##                        Object.folder += folders[i] +"/"
 ##
-    #open and then read the file
-    err_str=''
-    war_str=''
-    list_obj=[]
-    list_rel=[]
-    f=open(file,'r')        #open a file for reading
-    s=f.read()              #read the content of file f
-    #return a python object out of a json object
-    #with object_pairs_hook method, we can check "Error 07" at the same level
-    target=json.loads(s,object_pairs_hook=dupe_checking_hook)
-    if "library" in target.keys():
-        lib=''
-        folders=file.split("/")
-        for i in range(0,len(folders)-1):
-                lib+=folders[i]+"/"
-        lib+="lib"
-        valstr=Object.readLibrary(lib)
-        err_str+=valstr[0]
-        war_str+=valstr[1]
-        list_obj=valstr[2]
-        list_rel=valstr[3]
+        #open and then read the file
+        err_str=''
+        war_str=''
+        list_obj=[]
+        list_rel=[]
+        f=open(file,'r')        #open a file for reading
+        s=f.read()              #read the content of file f
+        #return a python object out of a json object
+        #with object_pairs_hook method, we can check "Error 07" at the same level
+        target=json.loads(s,object_pairs_hook=dupe_checking_hook)
+        if "library" in target.keys():
+                lib=''
+                folders=file.split("/")
+                for i in range(0,len(folders)-1):
+                        lib+=folders[i]+"/"
+                lib+="lib"
+                valstr=Object.readLibrary(lib)
+                err_str+=valstr[0]
+                war_str+=valstr[1]
+                list_obj=valstr[2]
+                list_rel=valstr[3]
 ##                Object.readLibrary(target['library'])
 ##                valstr=Object.readLibrary(target['library'])
 ##                err_str+=valstr[0]
 ##                war_str+=valstr[1]
-    f.close()
-    #To handle all the jason file format errors and warnings
-    valstr2=val_root(file,target,True,list_obj,list_rel)
-    err_str+=valstr2[0]
-    war_str+=valstr2[1]
-    try:
-        if err_str != "":
-            ##print ('There are errors!\n')
-            raise error(err_str)
-        else:
-            ##print('a model will be constructed!\n')
-            Object.model = True
-            Relation.model = True
-            model = Object(file.split(".")[0],target)
-    except error as e:
-        e.toStr()
-    try:
-        if war_str != "":
-            raise warning(war_str)
-    except warning as w:
-            w.toStr()
+        f.close()
+        #To handle all the jason file format errors and warnings
+        valstr2=val_root(file,target,True,list_obj,list_rel)
+        err_str+=valstr2[0]
+        war_str+=valstr2[1]
+        try:
+                if err_str != "":
+                        ##print ('There are errors!\n')
+                        raise error(err_str)
+                else:
+                        ##print('a model will be constructed!\n')
+                        Object.model = True
+                        Relation.model = True
+                        model = Object(file.split(".")[0],target)
+        except error as e:
+                e.toStr()
+        try:
+                if war_str != "":
+                        raise warning(war_str)
+        except warning as w:
+                w.toStr()
     #TO return the constructed model
 ##	return model
 
@@ -120,9 +120,11 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
         err_str+='Error 01: the field [nature] is not defined in the object '+tarname+'!\n'
     elif target["nature"] != "object":
         err_str+='Error 05:the nature of object '+tarname+' is not correct!\n'
-    if 'extends' in target.keys() and target['extends'] != '':
+    if not isroot and 'extends' in target.keys() and target['extends'] != '':
+        #print(list_obj)
+        #print(target['extends'])
         if target['extends'] not in list_obj and 'Error 02' not in list_obj:
-            err_str+=("Error 03: the object "+target['extends']+" is not defined !\n")
+            err_str+="Error 03: the object "+target['extends']+" extended in the .rau file is not defined !\n"
         if 'objects' in target.keys():
             target.pop("objects",None)
             #print("after pop",target.keys())
@@ -146,12 +148,16 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
                 err_str+='Error 05:the nature of'+tarname+'[relations]['+key+'] is not correct!\n'
             if 'from' not in target['relations'][key] or target['relations'][key]['from']==[]:
                 err_str+='Error 01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
-##            elif target['relations'][key]['from'] not in list_obj:
-##                err_str='Error 03: the object "+target['relations'][key]['from']+" in the field [from] is not defined !\n'
-            if 'to' not in target['relations'][key] or target['relations'][key]['to']==[]:
+            else:
+                for fr in target['relations'][key]['from']:
+                    if fr not in list_obj:
+                        err_str+='Error 03: the object '+fr+' in the field '+tarname+'[relations]['+key+'][from] is not defined !\n'
+            if 'to' not in target['relations'][key] or target['relations'][key]==[]:
                 err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
-##            elif target['relations'][key]['to'] not in list_obj:
-##                err_str='Error 03: the object "+target['relations'][key]['to']+" in the field [to] is not defined !\n'
+            else:
+                for fr in target['relations'][key]['to']:
+                    if fr not in list_obj:
+                        err_str+='Error 03: the object '+fr+' in the field '+tarname+'[relations]['+key+'][to] is not defined !\n'
             if 'extends' in target['relations'][key] and target['relations'][key]['extends']!='':
                 if target['relations'][key]['extends'] not in list_rel and 'Error 02' not in list_obj:
                     err_str+=("Error 04: the relation "+target['relations'][key]['extends']+" is not defined !\n")

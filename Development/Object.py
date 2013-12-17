@@ -26,44 +26,25 @@ class Object:
                 try:
                         if key in result:
                                 raise error('Error 07:Redundant definition of '+key+'!\n')
-#TODO Here I can give result a field "Error 07":"Redundant definition of "+key+ "!\n"
+#Here I can give result a field "Error 07":"Redundant definition of "+key+ "!\n"
                         result[key] = val
                 except error as e:
                         e.toStr()
         return result
 
 #finds the Object with the given name
-#TODO handle "Error 03: the object xx is not defined !"
+#handle "Error 03: the object xx is not defined !"
     @staticmethod
     def findObject(name):
         if name in Object.objects.keys() :
             return Object.objects[name]
 
-##                return Object.objects[name]
-
-##        try:
-##            if name in Object.objects.keys() :
-##                return Object.objects[name]
-##            elif Object.model:
-##                raise error("Error 033: the object "+name+" is not defined !")
-##        except error as e:
-##            e.toStr()
-
 #finds the relation with the given name
-#TODO handle "Error 04:the relation xx is not defined !"
+#handle "Error 04:the relation xx is not defined !"
     @staticmethod
     def findRelation(name):
         if name in Object.relations.keys() :
             return Object.relations[name]
-
-##        try:
-##                if name in Object.relations.keys() :
-##                        return Object.relations[name]
-##                else:
-##                        if Object.model:
-##                                raise error("Error 044:the relation "+name+" is not defined !")
-##        except error as e:
-##                e.toStr()
 
     @staticmethod
     def addObject(name,object):
@@ -149,11 +130,11 @@ class Object:
             for rel in ext_rel:
                 if rel not in list_rel:
                     err_str+='Error 04:the relation '+rel+' extended in the lib is not defined !\n'
-##        if dict_ft is not {}:
-##            for key in dict_ft.keys():
-##                if key not in list_obj and dict_ft[key]!=[]:
-##                    for tarname in dict_ft[key]:
-##                        err_str+='Error 03: the object '+key+ ' in '+tarname+' is not defined !\n'
+        if dict_ft is not {}:
+            for key in dict_ft.keys():
+                if key not in list_obj and type(dict_ft[key])==list and dict_ft[key]!=[]:
+                    for tarname in dict_ft[key]:
+                        err_str+='Error 03: the object '+key+ ' in '+tarname+' is not defined !\n'
         return err_str
 
     #handle "Error 06:A cyclic dependency detected! The cycle is

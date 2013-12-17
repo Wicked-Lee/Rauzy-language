@@ -1,7 +1,7 @@
 Test:
 a)This is a well written example, no errors or warnings should be raised
 
-Test_Error 00:"Expected type xx in xx, but type xx instead!"
+Test_Error 00:"Type xx expected in xx, but type xx detected instead!"
 
 Test_Error 01: "xx in the xx not defined!"
 a)absence of "nature" in bank[objects][Customer1]
