@@ -1,0 +1,37 @@
+{
+	"nature" :"library",
+	"objects": 
+		{
+			"Human":
+				{
+				  "nature":"object",
+				  "properties":{"name":"Anonymous","lastname":"Anonymous","gender":"unknown"}
+				},
+			"Student":
+				{
+				  "nature":"object",
+				  "extends":"Human",
+				  "properties":{"university":"unknown","age":"unknown","ISIC_number":"unknown"}
+				},
+			"Team":{
+				"nature":["object"],
+				"objects":{"Student1":{"nature":true, "extends":"Student"},"Student2":{"nature":"object", "extends":["Student"]},"Student3":[]},
+				"relations":{"Playwith":{"nature":"relation","extends":["collaboration"],"from":"Student1","to":"Student2"},"playwith2":[]}				
+				}
+		},
+	"relations":
+		{
+			"ownership":
+				{
+				  "nature":["relation"],
+				  "directional":"true",
+				  "properties":{"posessions":"things"}
+				},
+			"collaboration":
+				{
+				  "nature":"relation",
+				  "directional":false,
+				  "properties":{"type":"working relation"}
+				}
+		}
+}

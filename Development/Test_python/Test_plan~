@@ -1,9 +1,30 @@
 Test:
 a)This is a well written example, no errors or warnings should be raised
 
-Test_Error 00:"Type xx expected in xx, but type xx detected instead!"
-
-Test_Error 01: "xx in the xx not defined!"
+Test_Error 00:"Type xx expected in xx!"
+a)Bank['nature'] ***************************
+b)Bank1['objects']['Employer1']['extends']***************************
+c)Bank1['objects']['Employer1']['properties']***************************
+d)Bank1['objects']['Account1']['nature']***************************
+e)Bank1['objects']['Account1']['objects']***************************
+g)Bank['objects']['Account2']***************************
+h)Bank1['relations']['owns']['from']***************************
+i)Bank1['relations']['owns']['to']***************************
+j)Bank['relations']['fellowship']***************************
+k)lib['nature'] ***************************               
+l)lib1['objects']['Team']['nature']***************************
+m)lib2['objects']['Team']['objects']['Student1']['nature']***************************
+n)lib1['objects']['Team']['objects']['Student3']***************************
+o)lib2['objects']['Team']['objects']['Student2']['extends']***************************
+p)lib2['objects']['Team']['relations']['Playwith']['extends']***************************
+q)lib2['objects']['Team']['relations']['Playwith']['from']***************************
+r)lib2['objects']['Team']['relations']['Playwith']['to']***************************
+s)lib1['objects']['Team']['relations']['playwith2']***************************
+t)lib['objects']['Team2']***************************
+u)lib1['relations']['ownership']['nature']***************************
+v)lib2['relations']['ownership']['directional']
+w)lib['relations']['collegue']***************************
+Test_Error 01: "xx in the xx not defined!
 a)absence of "nature" in bank[objects][Customer1]
 b)absence of "nature" in bank[objects][Department1][Employer2]
 c)absence of "nature" in bank[relations][owns]

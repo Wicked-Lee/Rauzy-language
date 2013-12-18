@@ -167,6 +167,7 @@ class Object:
     @staticmethod
     def val_type(tarname,target):
         err_str=''
+        Error=False
         #[nature] must be string
         if 'nature' in target and not isinstance(target['nature'],str):
             err_str+='Error 00: Json type "string" expected in'+tarname+'[nature]! \n'
@@ -220,7 +221,12 @@ class Object:
                             err_str+='Error 00: Jason type "string" expected in '+tarname+' [to]['+elment+']! \n'
             else:
                 err_str+='Error 00: Jason type "array" expected in'+tarname+'[to]! \n'
-        return err_str
+        if 'directional' in target:
+            if not isinstance(target['directional'],bool):
+                err_str+='Error 00: Jason type "bool" expected in'+tarname+'[directional]! \n'
+        if err_str!='':
+            Error=True
+        return err_str,Error
 #handle "Error 01: xx in the xx not defined!"
 #handle "Error 03:the object xx is not defined !"
 #handle "Error 04:the relation xx is not defined !"
@@ -233,95 +239,108 @@ class Object:
     def val_lib(tarname,lib,target,islib,list_obj,list_rel,rd,ext_obj,ext_rel,dict_ft):
         err_str=""
         war_str=""
-        ##Check the types
-        err_str+=Object.val_type(tarname,target)
-        if not islib:
-            if 'extends' in target and target['extends']!='':
-                rd[tarname].append(target['extends'])
-                if target['extends'] not in ext_obj:
-                    ext_obj.append(target['extends'])
-            elif 'objects' in target and target['objects']!='':
+        #Type checking
+        Type1=Object.val_type(tarname,target)
+        if Type1[1]:
+            err_str+=Type1[0]
+        else:
+            if not islib:
+                if 'extends' in target and target['extends']!='':
+                    rd[tarname].append(target['extends'])
+                    if target['extends'] not in ext_obj:
+                        ext_obj.append(target['extends'])
+                elif 'objects' in target and target['objects']!='':
+                    for key in target['objects'].keys():
+                        rd[tarname].append(key)
+            if 'nature' not in target.keys() or target['nature']=='':
+                err_str+='Error 01: the field [nature] is not defined in the library '+tarname+'!\n'
+            elif target["nature"] != "library" and islib:
+                err_str+='Error 05:the [nature] of library '+tarname+' is not correct!\n'
+            elif target['nature'] !='object' and not islib:
+                err_str+='Error 05:the [nature] of object '+tarname+' is not correct!\n'
+            if 'extends' in target.keys() and target['extends'] != '':
+                if 'objects' in target.keys():
+                    target.pop("objects",None)
+                    war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
+                if 'relations' in target.keys():
+                    target.pop("relations",None)
+                    war_str+='Warning 03: "relations" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
+            if 'objects' in target.keys() and target['objects'] != '':
                 for key in target['objects'].keys():
-                    rd[tarname].append(key)
-        if 'nature' not in target.keys() or target['nature']=='':
-            err_str+='Error 01: the field [nature] is not defined in the library '+tarname+'!\n'
-        elif target["nature"] != "library" and islib:
-            err_str+='Error 05:the [nature] of library '+tarname+' is not correct!\n'
-        elif target['nature'] !='object' and not islib:
-            err_str+='Error 05:the [nature] of object '+tarname+' is not correct!\n'
-        if 'extends' in target.keys() and target['extends'] != '':
-            if 'objects' in target.keys():
-                target.pop("objects",None)
-                war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
-            if 'relations' in target.keys():
-                target.pop("relations",None)
-                war_str+='Warning 03: "relations" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
-        if 'objects' in target.keys() and target['objects'] != '':
-            for key in target['objects'].keys():
-                #with below, we can check "Error 07" at the different levels
-                if key in list_obj:
-                    err_str+='Error 07:Redundant definition of object '+key+'!\n'
-                else:
-                    list_obj.append(key)
-                valstr=Object.val_lib(key,lib,target['objects'][key],False,list_obj,list_rel,rd,ext_obj,ext_rel,dict_ft)
-                err_str+=valstr[0]
-                war_str+=valstr[1]
-        if islib and 'relations' in target and target['relations']!='':
-            for key in target['relations'].keys():
-                if 'nature' not in target['relations'][key]:
-                    err_str+='Error 01: the field [nature] is not defined in'+tarname+'[relations]['+key+']\n'
-                elif target['relations'][key]['nature'] != 'relation':
-                    err_str+='Error 05:the [nature] of'+tarname+'[relations]['+key+'] is not correct!\n'
-                if 'from' in target['relations'][key]:
-                    war_str+='Warning 01: the field [from] should not be defined in '+tarname+'[relations]['+key+']\n'
-                if 'to' in target['relations'][key]:
-                    war_str+='Warning 01: the field [to] should not be defined in '+tarname+'[relations]['+key+']\n'
-                if 'directional' not in target['relations'][key]:
-                    err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
-        if not islib and 'relations' in target and target['relations']!='':
-            for key in target['relations'].keys():
-                if 'extends' in target['relations'][key] and target['relations'][key]['extends']!='':
-                        string=target['relations'][key]['extends']
-                        if string !='' and string not in ext_rel:
-                            ext_rel.append(string)
-                #with below, we can check "Error 07" at the different levels
-                if key in list_rel:
-                    err_str+='Error 07:Redundant definition of relation '+key+'!\n'
-                else:
-                    list_rel.append(key)
-                if 'nature' not in target['relations'][key]:
-                    err_str+='Error 01: the field [nature] is not defined in lib['+tarname+'][relations]['+key+']\n'
-                elif target['relations'][key]['nature'] != 'relation':
-                    err_str+='Error 05:the [nature] of'+tarname+'[relations]['+key+'] is not correct!\n'
-                if 'from' not in target['relations'][key] or target['relations'][key]['from']==[]:
-                    err_str+='Error 01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
-                else:
-                    for obj in target['relations'][key]['from']:
-                        dict_ft[obj].append(tarname+'[relations]['+key+'][from]')
-                if 'to' not in target['relations'][key] or target['relations'][key]['to']==[]:
-                    err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
-                else:
-                    for obj in target['relations'][key]['to']:
-                        dict_ft[obj].append(tarname+'[relations]['+key+'][to]')
-                if 'extends' not in target['relations'][key] or target['relations'][key]['extends']=='':
-                    if 'directional' not in target['relations'][key] or target['relations'][key]=='':
-                        err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
-                elif 'directional' in target['relations'][key] and target['relations'][key]['directional']!='':
-                    war_str+="Warning 03: [directional] in relation "+key+" will be overriden by that of relation "+target['relations'][key]['extends']+" as "+key+" extends "+target['relations'][key]['extends']+"\n"
-                    target['relations'][key].pop("directional",None)
-        if islib:
-            if 'relations' in target.keys() and target['relations']!='':
-                for key_rel in target['relations'].keys():
-                    list_rel.append(key_rel)
-                    if 'extends' in target['relations'][key_rel] and target['relations'][key_rel]['extends']!='':
-                        string=target['relations'][key_rel]['extends']
-                        if string !='' and string not in ext_rel:
-                            ext_rel.append(string)
-            for key in target.keys():
-                if key not in ['nature','objects','relations']:
-                    err_str+="Error 08:Incorrect library file format: ["+key+"] not recognized!\n"
-        if 'library' in target.keys() and target['library']!='':
-            war_str+='Warning 02:Detect of a library member in '+tarname+',but '+tarname+' is not the root object\n'
+                    #with below, we can check "Error 07" at the different levels
+                    if key in list_obj:
+                        err_str+='Error 07:Redundant definition of object '+key+'!\n'
+                    else:
+                        list_obj.append(key)
+                    valstr=Object.val_lib(key,lib,target['objects'][key],False,list_obj,list_rel,rd,ext_obj,ext_rel,dict_ft)
+                    err_str+=valstr[0]
+                    war_str+=valstr[1]
+            if islib and 'relations' in target and target['relations']!={}:
+                for key in target['relations'].keys():
+                    #Type checking
+                    Type2=Object.val_type(tarname+'[relations]['+key+']',target['relations'][key])
+                    if Type2[1]:
+                        err_str+=Type2[0]
+                    else:
+                        if 'nature' not in target['relations'][key]:
+                            err_str+='Error 01: the field [nature] is not defined in'+tarname+'[relations]['+key+']\n'
+                        elif target['relations'][key]['nature'] != 'relation':
+                            err_str+='Error 05:the [nature] of'+tarname+'[relations]['+key+'] is not correct!\n'
+                        if 'from' in target['relations'][key]:
+                            war_str+='Warning 01: the field [from] should not be defined in '+tarname+'[relations]['+key+']\n'
+                        if 'to' in target['relations'][key]:
+                            war_str+='Warning 01: the field [to] should not be defined in '+tarname+'[relations]['+key+']\n'
+                        if 'directional' not in target['relations'][key]:
+                            err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
+            if not islib and 'relations' in target and target['relations']!={}:
+                for key in target['relations'].keys():
+                    #Type checking
+                    Type3=Object.val_type(tarname+'[relations]['+key+']',target['relations'][key])
+                    if Type3[1]:
+                        err_str+=Type3[0]
+                    else:
+                        if 'extends' in target['relations'][key] and target['relations'][key]['extends']!='':
+                                string=target['relations'][key]['extends']
+                                if string !='' and string not in ext_rel:
+                                    ext_rel.append(string)
+                        #with below, we can check "Error 07" at the different levels
+                        if key in list_rel:
+                            err_str+='Error 07:Redundant definition of relation '+key+'!\n'
+                        else:
+                            list_rel.append(key)
+                        if 'nature' not in target['relations'][key]:
+                            err_str+='Error 01: the field [nature] is not defined in lib['+tarname+'][relations]['+key+']\n'
+                        elif target['relations'][key]['nature'] != 'relation':
+                            err_str+='Error 05:the [nature] of'+tarname+'[relations]['+key+'] is not correct!\n'
+                        if 'from' not in target['relations'][key] or target['relations'][key]['from']==[]:
+                            err_str+='Error 01: the field [from] is not defined in '+tarname+'[relations]['+key+']\n'
+                        else:
+                            for obj in target['relations'][key]['from']:
+                                dict_ft[obj].append(tarname+'[relations]['+key+'][from]')
+                        if 'to' not in target['relations'][key] or target['relations'][key]['to']==[]:
+                            err_str+='Error 01: the field [to] is not defined in '+tarname+'[relations]['+key+']\n'
+                        else:
+                            for obj in target['relations'][key]['to']:
+                                dict_ft[obj].append(tarname+'[relations]['+key+'][to]')
+                        if 'extends' not in target['relations'][key] or target['relations'][key]['extends']=='':
+                            if 'directional' not in target['relations'][key] or target['relations'][key]=='':
+                                err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
+                        elif 'directional' in target['relations'][key] and target['relations'][key]['directional']!='':
+                            war_str+="Warning 03: [directional] in relation "+key+" will be overriden by that of relation "+target['relations'][key]['extends']+" as "+key+" extends "+target['relations'][key]['extends']+"\n"
+                            target['relations'][key].pop("directional",None)
+            if islib:
+                if 'relations' in target.keys() and target['relations']!='':
+                    for key_rel in target['relations'].keys():
+                        list_rel.append(key_rel)
+                        if 'extends' in target['relations'][key_rel] and target['relations'][key_rel]['extends']!='':
+                            string=target['relations'][key_rel]['extends']
+                            if string !='' and string not in ext_rel:
+                                ext_rel.append(string)
+                for key in target.keys():
+                    if key not in ['nature','objects','relations']:
+                        err_str+="Error 08:Incorrect library file format: ["+key+"] not recognized!\n"
+            if 'library' in target.keys() and target['library']!='':
+                war_str+='Warning 02:Detect of a library member in '+tarname+',but '+tarname+' is not the root object\n'
         return [err_str,war_str]
 
 #properties dictionary
