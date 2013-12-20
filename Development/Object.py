@@ -82,22 +82,25 @@ class Object:
                 #print('\n'*2)
                 err_str+=Object.cycle_test(reldict,[],'',True)
                 err_str+=Object.notdefined(list_obj,list_rel,ext_obj,ext_rel,dict_ft)
-##				for key in target.keys():
-##					if key == "objects":
-##						for objectName in target[key].keys() :
-##							object = Object(objectName,target[key][objectName])
-##							Object.addObject(objectName,object)
-##							Object.objectsLib[objectName]=object
-##					elif key == "relations":
-##						for relationName in target[key].keys():
-##							relation = Relation(relationName,target[key][relationName])
-##							Relation.addRelation(relationName,relation)
-##							Object.addRelation(relationName,relation)
-##							Object.relationsLib[relationName]=relation
-##					elif key == 'nature':
-##						pass
-##					else:
-##						raise error("Error 08: field "+key+" in library is not recognised !")
+                if err_str=='':
+                    for key in target.keys():
+                        if key == "objects":
+                            for objectName in target[key].keys():
+                                object = Object(objectName,target[key][objectName])
+                                #add object into Object.objects
+                                Object.addObject(objectName,object)
+                                #add object into Object.objectsLib
+                                Object.objectsLib[objectName]=object
+                        elif key == "relations":
+                            for relationName in target[key].keys():
+                                relation = Relation(relationName,target[key][relationName])
+                                Relation.addRelation(relationName,relation)
+                                Object.addRelation(relationName,relation)
+                                Object.relationsLib[relationName]=relation
+                        elif key == 'nature':
+                            pass
+                        else:
+                            raise error("Error 08: field "+key+" in library is not recognised !")
         except IOError:
             err_str+=('Error 02: library file is not found!\n')
             list_obj=['Error 02']
@@ -365,20 +368,23 @@ class Object:
             newProperties = nested_json["properties"]
             for prop in newProperties.keys():
                 self.properties[prop] = newProperties[prop]
-        #objects must be an array
+        #If 'extends', take it as a parent
         if 'extends' in nested_json.keys():
             self.parent = nested_json["extends"]
             par = Object.findObject(self.parent)
             self.inherit(par)
         else :
             self.parent = ""
+        #Object.objects is an array
         self.objects = []
         if 'objects' in nested_json.keys():
             for objName in nested_json['objects'].keys():
+                #What is this? Is it a boolean?
                 if nested_json['objects'][objName]:
+                    #Construct "object" recursively
                     object = Object(objName,nested_json['objects'][objName])
-                    self.objects.append(objName)
-                    Object.objects[objName] = object
+                    self.objects.append(objName) #TODO we construct the local "objects" list
+                    Object.objects[objName] = object #TODO We construct the global "objects" dictionary
                 else :  # case of empty str read from a file
                     f=open(Object.folder+objName+".rau",'r')        #open a file for reading
                     s=f.read()              #read the content of file f
