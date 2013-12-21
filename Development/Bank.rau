@@ -7,16 +7,35 @@
 				"extends":"Human",
 				"properties" :{"name":"Georgios","lastname":"Papoutsakis"}
 			},
-			"Employer1":
-				{"nature":"object",
-				"extends":"Human",
-				"properties" : 
-					{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
-				},
 			"Account1":
 				{"nature":"object",
 				"properties" : {"Id":"AB325E","amount":"30000"}
-				}  
+				}, 
+			"TeamA":
+				{
+				"nature":"object",
+				"extends":"Team",
+				"properties":{"objective":"test"}
+				},
+			"Department1":
+				{
+				"nature":"object",
+				"objects":
+				    {
+					"Employer1":
+					{"nature":"object",
+					"extends":"Human",
+					"properties" : 
+						{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
+					},
+					"Employer2":
+					{"nature":"object",
+					"extends":"Human",
+					"properties" : 
+						{"name":"Wushika", "lastname":"nibula", "salary":"200000", "worksIn":"backdesk"}
+					}	
+				     }
+				}   
 			},
 	"relations":
 		{  

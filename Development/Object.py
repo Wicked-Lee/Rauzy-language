@@ -18,7 +18,10 @@ class Object:
     objectsLib = dict()
 #library with only the referenced relations
     relationsLib = dict()
-
+#dict of objects to be flattened
+    flatObj=dict()
+#dict of relations to be flattened
+    flatRel=dict()
     @staticmethod
     def dupe_checking_hook(pairs):
         result = dict()
@@ -38,7 +41,6 @@ class Object:
     def findObject(name):
         if name in Object.objects.keys() :
             return Object.objects[name]
-
 #finds the relation with the given name
 #handle "Error 04:the relation xx is not defined !"
     @staticmethod
@@ -261,10 +263,10 @@ class Object:
                 err_str+='Error 05:the [nature] of object '+tarname+' is not correct!\n'
             if 'extends' in target.keys() and target['extends'] != '':
                 if 'objects' in target.keys():
-                    target.pop("objects",None)
+                    #target.pop("objects",None)
                     war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
                 if 'relations' in target.keys():
-                    target.pop("relations",None)
+                    #target.pop("relations",None)
                     war_str+='Warning 03: "relations" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
             if 'objects' in target.keys() and target['objects'] != '':
                 for key in target['objects'].keys():
@@ -328,7 +330,7 @@ class Object:
                                 err_str+='Error 01: the field [directional] is not defined in '+tarname+'[relations]['+key+']\n'
                         elif 'directional' in target['relations'][key] and target['relations'][key]['directional']!='':
                             war_str+="Warning 03: [directional] in relation "+key+" will be overriden by that of relation "+target['relations'][key]['extends']+" as "+key+" extends "+target['relations'][key]['extends']+"\n"
-                            target['relations'][key].pop("directional",None)
+                            #target['relations'][key].pop("directional",None)
             if islib:
                 if 'relations' in target.keys() and target['relations']!='':
                     for key_rel in target['relations'].keys():
@@ -366,70 +368,73 @@ class Object:
             newProperties = nested_json["properties"]
             for prop in newProperties.keys():
                 self.properties[prop] = newProperties[prop]
-        #If 'extends', take it as a parent
-        if 'extends' in nested_json.keys():
+        #Object.objects is an array
+        self.objects = []
+        if 'extends' in nested_json.keys() and nested_json['extends']!='':
             self.parent = nested_json["extends"]
             par = Object.findObject(self.parent)
             self.inherit(par)
-        else :
+        else:
             self.parent = ""
-        #Object.objects is an array
-        self.objects = []
-        if 'objects' in nested_json.keys():
-            for objName in nested_json['objects'].keys():
-                #What is this? Is it a boolean?
-                if nested_json['objects'][objName]:
-                    #Construct "object" recursively
-                    object = Object(objName,nested_json['objects'][objName])
-                    self.objects.append(objName) #TODO we construct the local "objects" list of strings
-                    Object.objects[objName] = object #TODO We construct the global "objects" dictionary of objects
-                else :  # case of empty str read from a file
-                    f=open(Object.folder+objName+".rau",'r')        #open a file for reading
-                    s=f.read()              #read the content of file f
-                    #return a python object out of a json object
-                    target=json.loads(s)
-                    f.close()
-                    object = Object(objName,target)
-                    self.objects.append(objName)
-                    Object.objects[objName] = object
-        #relations must be an array
-        if 'relations' in nested_json.keys():
-            for rel in nested_json['relations'] :
-                if not nested_json['relations'][rel]: # case of empty str read from a file
-                    f=open(Object.folder+rel+".rau",'r')        #open a file for reading
-                    s=f.read()              #read the content of file f
-                    #return a python object out of a json object
-                    target=json.loads(s)
-                    f.close()
-                    relation = Relation(rel,target)
-                    self.objects.append(rel)
-                    Object.relations[rel] = relation
-                    self.relations.append(rel)
-                if isinstance(nested_json['relations'][rel], str) :
-                    self.relations.append(rel)
-                else :
-                    relation = Relation(rel,nested_json['relations'][rel])
-                    Object.relations[rel] = relation #TODO we construct the global "relations" dictionary of relations
-                    self.relations.append(rel) #TODO we construct the local "relations" list of strings
-
+            if 'objects' in nested_json.keys():
+                for objName in nested_json['objects'].keys():
+                    #What is this? Is it a boolean?
+                    if nested_json['objects'][objName]:
+                        #Construct "object" recursively
+                        obj = Object(objName,nested_json['objects'][objName])
+                        self.objects.append(objName) #TODO we construct the local "objects" list of strings
+                        Object.objects[objName] = obj #TODO We construct the global "objects" dictionary of "Object"s
+                    else :  # case of empty str read from a file
+                        f=open(Object.folder+objName+".rau",'r')        #open a file for reading
+                        s=f.read()              #read the content of file f
+                        #return a python object out of a json object
+                        target=json.loads(s)
+                        f.close()
+                        object = Object(objName,target)
+                        self.objects.append(objName)
+                        Object.objects[objName] = object
+            #relations must be an array
+            if 'relations' in nested_json.keys():
+                for rel in nested_json['relations'] :
+                    if not nested_json['relations'][rel]: # case of empty str read from a file
+                        f=open(Object.folder+rel+".rau",'r')        #open a file for reading
+                        s=f.read()              #read the content of file f
+                        #return a python object out of a json object
+                        target=json.loads(s)
+                        f.close()
+                        relation = Relation(rel,target)
+                        self.objects.append(rel)
+                        Object.relations[rel] = relation
+                        self.relations.append(rel)
+                    if isinstance(nested_json['relations'][rel], str) :
+                        self.relations.append(rel)
+                    else :
+                        relation = Relation(rel,nested_json['relations'][rel])
+                        Object.relations[rel] = relation #TODO we construct the global "relations" dictionary of relations
+                        self.relations.append(rel) #TODO we construct the local "relations" list of strings
 
     def inherit(self,parent):
-        if parent :
-            self.properties = dict()
+        if parent:
             self.objects = []
             self.relations = []
             if parent.properties:
-                for prop in parent.properties :
-                    self.properties[prop] = parent.properties[prop]
+                for prop in parent.properties:
+                    if prop not in self.properties.keys():
+                        self.properties[prop] = parent.properties[prop]
             if parent.objects:
                 for obj in parent.objects:
                     self.objects.append(obj)
+                #print(parent.objects)
             if parent.relations:
                 for rel in parent.relations :
                     self.relations.append(rel)
 
 #returns a string representation of this object
     def toStr(self,indent):
+        if indent=="flat":
+            flat=True
+            indent=''
+        #print('objects:'+self.name,self.parent)
         output = indent + "Name : " + self.name +"\n"
         if self.parent:
             output += indent + "Extends : " + self.parent +"\n"
@@ -440,13 +445,13 @@ class Object:
         if self.objects:
             output += indent + "Objects : \n"
             for objName in self.objects :
-                object = Object.findObject(objName)
-                output += object.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"
-        if self.relations:
+                obj = Object.findObject(objName)
+                output += obj.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"
+        if self.relations and not flat:
             output += indent + "Relations : \n"
             for relName in self.relations :
-                relation = Object.findRelation(relName)
-                output += relation.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"
+                rel = Object.findRelation(relName)
+                output += rel.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"
         return output
 
 #returns a JSON representation of this object
@@ -489,5 +494,19 @@ class Object:
         return output
 
 #no need for that function this is done when reading
-    def flatten():
-        pass
+    @staticmethod
+    def flatten(list_obj,list_rel):
+        for obj in list_obj:
+            temp=Object.findObject(obj)
+            if temp.parent:
+                if temp.objects:
+                    for objName in temp.objects:
+                        if objName not in list_obj:
+                            list_obj.append(objName)
+                if temp.relations:
+                    for relName in temp.relations:
+                        if relName not in list_rel:
+                            list_rel.append(relName)
+            Object.flatObj[obj]=temp
+        for rel in list_rel:
+            Object.flatRel[rel]=Object.findRelation(rel)

@@ -65,7 +65,9 @@ def parse(file):
                 list_obj=valstr[2]
                 list_rel=valstr[3]
         #To handle all the errors and warnings in "root" json file
-        valstr2=val_root(file,target,True,list_obj,list_rel)
+        rootobj=[]
+        rootrel=[]
+        valstr2=val_root(file,target,True,list_obj,list_rel,rootobj,rootrel)
         err_str+=valstr2[0]
         war_str+=valstr2[1]
         try:
@@ -77,6 +79,9 @@ def parse(file):
                         Object.model = True
                         Relation.model = True
                         model = Object(file.split(".")[0],target)
+                        Object.flatten(rootobj,rootrel)
+                        #print(Object.objects)
+                        #print(Object.objects['TeamA'].toStr(""))
         except error as e:
                 e.toStr()
         try:
@@ -113,7 +118,7 @@ def toFile(folder):
 #handle "Warning 02:Detect of a library member in xx, but xx is not the root object."
 #handle "Warning 03: [objects] and [relations] in object A will be overriden by these of object B as A extends B"
 #tarname is name of the object(not necessarily the root object), target is the parsed file, "isroot" to signify the object is the root object or not
-def val_root(tarname,target,isroot,list_obj,list_rel):
+def val_root(tarname,target,isroot,list_obj,list_rel,rootobj,rootrel):
     err_str=""
     war_str=""
     #Type checking
@@ -129,7 +134,7 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
             if target['extends'] not in list_obj and 'Error 02' not in list_obj:
                 err_str+=("Error 03: the object "+target['extends']+"extended in the root file is not defined !\n")
             if 'objects' in target.keys():
-                target.pop("objects",None)
+                #target.pop("objects",None)
                 #print("after pop",target.keys())
                 war_str+='Warning 03: "objects" in object '+tarname+' will be overriden by these of object '+target['extends']+' as '+tarname+'extends'+target['extends']+'\n'
         if 'objects' in target.keys() and target['objects'] != '':
@@ -139,12 +144,14 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
                     err_str+='Error 07:Redundant definition of object '+key+'!\n'
                 else:
                     list_obj.append(key)
-                valstr=val_root(key,target['objects'][key],False,list_obj,list_rel)
+                    rootobj.append(key)
+                valstr=val_root(key,target['objects'][key],False,list_obj,list_rel,rootobj,rootrel)
                 err_str+=valstr[0]
                 war_str+=valstr[1]
         if isroot and 'relations' in target.keys() and target['relations'] != '':
             ##print('List of relations:\n',list_rel)
             for key in target['relations'].keys():
+                rootrel.append(key)
                 #Type checking
                 Type1=Object.val_type(tarname+'[relations]['+key+']',target['relations'][key])
                 if Type1[1]:
@@ -181,10 +188,23 @@ def printModel():
     print (model.toStr(""))
 
 def flattenModel():
-    pass
+    print()
+    print('*'*80+'\n'+'Flattened objects:\n')
+    for obj in Object.flatObj.keys():
+        print(obj,':')
+        print(Object.flatObj[obj].toStr("flat"))
+    print('*'*80+'\n'+'Flattened relations:\n')
+    for rel in Object.flatRel.keys():
+        print(rel,':')
+        print(Object.flatRel[rel].toStr("flat"))
 
 def abstractModel(level):
-    pass
+    for obj in Object.objects.keys():
+        print(obj,':')
+        print(Object.objects[obj].toStr(""))
+    for rel in Object.relations.keys():
+        print(rel,':')
+        print(Object.relations[rel].toStr(""))
 
 def modifyModel(field,newvalue):
     pass
@@ -262,7 +282,7 @@ while(input1!='exit'):
             print('The basic model is not loaded ! Use"read <filename>" to load it !')
     elif input1.startswith('abstract'):
         if model:
-            if len(input1.split())!=2 or type(input1.split()[1])!=int:
+            if len(input1.split())!=2:
                 print ('usage:abstract <level of abstraction>')
             else:
                 abstractModel(input1.split()[1])
@@ -274,6 +294,7 @@ while(input1!='exit'):
             if commit=='y':
                 modifyModel(field,newfield)
     else :
+        print('Function not recognized!')
         print ('type \'help\' for help')
 
     if not model:
