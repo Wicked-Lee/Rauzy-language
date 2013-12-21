@@ -180,16 +180,28 @@ def printModel():
     print (model)
     print (model.toStr(""))
 
+def flattenModel():
+    pass
+
+def abstractModel(level):
+    pass
+
+def modifyModel(field,newvalue):
+    pass
+
+def compareModels():
+    pass
 
 #root Object
 ##model = parse("Bank.rau")
 model = None
+model2=None #Another model to compare
 print ('type \'help\' for help')
 input1=input('>>')
 #input1 = raw_input('>>')
 while(input1!='exit'):
     if input1.startswith('read'):
-        print('begin to read')
+        #print('begin to read')
         Object.objects = dict()
         Object.relations = dict()
         Object.objectsLib = dict()
@@ -202,25 +214,70 @@ while(input1!='exit'):
                 print ('file \'' + file + '\' does not exist!')
             else:
                 model = parse(file)
+    elif input1.startswith('read2'):
+        if model:
+            print('Read another model for comparaison')
+            Object.objects = dict()
+            Object.relations = dict()
+            Object.objectsLib = dict()
+            Object.relationsLib = dict()
+            if len(input1.split()) != 2:
+                print ('usage: read <file name>')
+            else :
+                file = input1.split()[1]
+                if not os.path.exists(file):
+                    print ('file \'' + file + '\' does not exist')
+                else:
+                    model = parse(file)
     elif input1 == "help":
         print ("Available commands")
-        print ('read <file name> \t to load a model')
-        print ('save <folder name> \t to save the model in a file')
-        print ('print \t\t\t to print the model in the screen')
+        print ('read <file name> \t to load the basic model')
+        print('read2 <file name>  \t to load the second model for comparaison')
+        print ('save <folder name> \t to save the basic model in a file')
+        print ('print \t\t\t to print the basic model in the screen')
+        print('abstract <level>\t to abstract the basic model to a certain level(integer)')
+        print('flatten\t\t\t to flatten the basic model')
+        print('compare\t\t\t to compare the basic model and the second model')
+        print('modify\t\t\t to modify the basic model')
         print ('exit \t\t\t to exit')
     elif input1 == 'print':
         if model:
             printModel()
-        else:
-            print ('No model has been loaded')
     elif input1.startswith('save'):
-        if len(input1.split()) != 2:
-            print ('usage: save <folder name>')
+        if model:
+            if len(input1.split()) != 2:
+                print ('usage: save <folder name>')
+            else:
+                folder = input1.split()[1]
+                toFile(folder)
+    elif input1=='flatten':
+        if model:
+            flattenModel()
+    elif input1=='compare':
+        if model and model2:
+            compareModels()
+        elif model:
+            print('The model for comparaison is not loaded ! Use "read2 <filename>" to load it !')
         else:
-            folder = input1.split()[1]
-            toFile(folder)
+            print('The basic model is not loaded ! Use"read <filename>" to load it !')
+    elif input1.startswith('abstract'):
+        if model:
+            if len(input1.split())!=2 or type(input1.split()[1])!=int:
+                print ('usage:abstract <level of abstraction>')
+            else:
+                abstractModel(input1.split()[1])
+    elif input1=='modify':
+        if model:
+            field=input('Field to be modified: ')
+            newfield=input('The new value: ')
+            commit=input('Commit the changes?(y/n): ')
+            if commit=='y':
+                modifyModel(field,newfield)
     else :
         print ('type \'help\' for help')
+
+    if not model:
+        print('The basic model is not loaded ! load a model with "read <filename>" !')
     input1=input('>>')
     #input1 = raw_input('>>')
 
