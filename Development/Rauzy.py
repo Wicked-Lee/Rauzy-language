@@ -19,23 +19,24 @@ def dupe_checking_hook(pairs):
     return result
 
 def parse(file):
-##    Object.folder = ""
-##	Object.model = False
-##	Relation.model = False
-##	model = None
-##    print ('type \'help\' for help')
-##    input = raw_input('>>')
-##    while(input!='exit') :
-##        if input.startswith('read'):
-##            Object.objects = dict()
-##            Object.relations = dict()
-##            Object.objectsLib = dict()
-##            Object.relationsLib = dict()
-##            if len(input.split()) != 2:
-##                folders = file.split("/")
-##                for i in range(0,len(folders)-1):
-##                        Object.folder += folders[i] +"/"
-##
+        Object.folder = ""
+        Object.model = False
+        Relation.model = False
+        model = None
+##        print ('type \'help\' for help')
+##        input1=input('>>')
+##        #input1 = raw_input('>>')
+##        while(input1!='exit') :
+##            if input1.startswith('read'):
+##                Object.objects = dict()
+##                Object.relations = dict()
+##                Object.objectsLib = dict()
+##                Object.relationsLib = dict()
+##                if len(input1.split()) != 2:
+##                    folders = file.split("/")
+##                    for i in range(0,len(folders)-1):
+##                            Object.folder += folders[i] +"/"
+
         #open and then read the file
         err_str=''
         war_str=''
@@ -47,6 +48,7 @@ def parse(file):
         s=s.replace("\n","")    #replace the string "\n" by ""
         s=s.replace("\t","")    #replace the string "\t" by ""
         s=" ".join(s.split())   #remove the duplicated spaces
+        f.close()
         #return a python object out of a json object
         #with object_pairs_hook method, we can check "Error 07" at the same level
         target=json.loads(s,object_pairs_hook=dupe_checking_hook)
@@ -56,17 +58,13 @@ def parse(file):
                 for i in range(0,len(folders)-1):
                         lib+=folders[i]+"/"
                 lib+=target['library']
+                #To handle all the errors and warnings in "library" json file
                 valstr=Object.readLibrary(lib)
                 err_str+=valstr[0]
                 war_str+=valstr[1]
                 list_obj=valstr[2]
                 list_rel=valstr[3]
-##                Object.readLibrary(target['library'])
-##                valstr=Object.readLibrary(target['library'])
-##                err_str+=valstr[0]
-##                war_str+=valstr[1]
-        f.close()
-        #To handle all the jason file format errors and warnings
+        #To handle all the errors and warnings in "root" json file
         valstr2=val_root(file,target,True,list_obj,list_rel)
         err_str+=valstr2[0]
         war_str+=valstr2[1]
@@ -87,7 +85,7 @@ def parse(file):
         except warning as w:
                 w.toStr()
     #TO return the constructed model
-##	return model
+        return model
 
 #writes the necessary files for this model
 #One file for root object
@@ -179,75 +177,78 @@ def val_root(tarname,target,isroot,list_obj,list_rel):
 
 #prints the model in screen
 def printModel():
-    print (Model)
+    print (model)
     print (model.toStr(""))
 
 
 #root Object
-#model = parse("Bank.rau")
-#model = None
-#print ('type \'help\' for help')
-#input = raw_input('>>')
-#while(input!='exit') :
-#	if input.startswith('read'):
-#		Object.objects = dict()
-#		Object.relations = dict()
-#		Object.objectsLib = dict()
-#		Object.relationsLib = dict()
-#		if len(input.split()) != 2:
-#			print ('usage: read <file name>')
-#		else :
-#			file = input.split()[1]
-#			if not os.path.exists(file):
-#				print ('file \'' + file + '\' does not exist!')
-#			else:
-#				model = parse(file)
-#	elif input == "help":
-#		print ("Available commands")
-#		print ('read <file name> \t to load a model')
-#		print ('save <folder name> \t to save the model in a file')
-#		print ('print \t\t\t to print the model in the screen')
-#		print ('exit \t\t\t to exit')
-#	elif input == 'print':
-#		if model:
-#			printModel()
-#		else:
-#			print ('No model has been loaded')
-#	elif input.startswith('save'):
-#		if len(input.split()) != 2:
-#			print ('usage: save <folder name>')
-#		else:
-#			folder = input.split()[1]
-#			toFile(folder)
-#	else :
-#		print ('type \'help\' for help')
-#	input = raw_input('>>')
+##model = parse("Bank.rau")
+model = None
+print ('type \'help\' for help')
+input1=input('>>')
+#input1 = raw_input('>>')
+while(input1!='exit'):
+    if input1.startswith('read'):
+        print('begin to read')
+        Object.objects = dict()
+        Object.relations = dict()
+        Object.objectsLib = dict()
+        Object.relationsLib = dict()
+        if len(input1.split()) != 2:
+            print ('usage: read <file name>')
+        else :
+            file = input1.split()[1]
+            if not os.path.exists(file):
+                print ('file \'' + file + '\' does not exist!')
+            else:
+                model = parse(file)
+    elif input1 == "help":
+        print ("Available commands")
+        print ('read <file name> \t to load a model')
+        print ('save <folder name> \t to save the model in a file')
+        print ('print \t\t\t to print the model in the screen')
+        print ('exit \t\t\t to exit')
+    elif input1 == 'print':
+        if model:
+            printModel()
+        else:
+            print ('No model has been loaded')
+    elif input1.startswith('save'):
+        if len(input1.split()) != 2:
+            print ('usage: save <folder name>')
+        else:
+            folder = input1.split()[1]
+            toFile(folder)
+    else :
+        print ('type \'help\' for help')
+    input1=input('>>')
+    #input1 = raw_input('>>')
 
 ####################################################################################
 #############################
 #To test Errors and Warnings#
 #############################
 ##To test Error01-Error08
-print('*'*80+'\nBegin to test!\n'+'*'*80+'\n')
-for i in ['1','2','3','4','5','6','7','8']:
-    file='Test_python/Test_Error0'+i+'/Bank.rau'
-    target=parse(file)
-    print('*'*80+'\nTest_error0'+i+' finished!\n'+'*'*80+'\n')
-##To test Warnings
-file="Test_python/Test_Warnings/Bank.rau"
-target=parse(file)
-print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')
-##To test Error00
-file0='Test_python/Test_Error00/Bank.rau'
-target=parse(file0)
-print('*'*20+'The first level analysis finished'+'*'*20+'\n')
-file1='Test_python/Test_Error00/Bank1.rau'
-target=parse(file1)
-print('*'*20+'The second level analysis finished'+'*'*20+'\n')
-file2='Test_python/Test_Error00/Bank2.rau'
-target=parse(file2)
-print('*'*20+'The third level analysis finished'+'*'*20+'\n')
-print('*'*80+'\nTest_Error00 finished!\n'+'*'*80+'\n')
+##print('*'*80+'\nBegin to test!\n'+'*'*80+'\n')
+##for i in ['1','2','3','4','5','6','7','8']:
+##    file='Test_python/Test_Error0'+i+'/Bank.rau'
+##    target=parse(file)
+##    print('*'*80+'\nTest_error0'+i+' finished!\n'+'*'*80+'\n')
+####To test Warnings
+##file="Test_python/Test_Warnings/Bank.rau"
+##target=parse(file)
+##print('*'*80+'\nTest_Warnings finished!\n'+'*'*80+'\n')
+####To test Error00
+##file0='Test_python/Test_Error00/Bank.rau'
+##target=parse(file0)
+##print('*'*20+'The first level analysis finished'+'*'*20+'\n')
+##file1='Test_python/Test_Error00/Bank1.rau'
+##target=parse(file1)
+##print('*'*20+'The second level analysis finished'+'*'*20+'\n')
+##file2='Test_python/Test_Error00/Bank2.rau'
+##target=parse(file2)
+##print('*'*20+'The third level analysis finished'+'*'*20+'\n')
+##print('*'*80+'\nTest_Error00 finished!\n'+'*'*80+'\n')
 ####################################################################################
 #model = parse("Bank.rau")
 #printModel()

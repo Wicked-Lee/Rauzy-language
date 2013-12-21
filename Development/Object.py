@@ -86,21 +86,19 @@ class Object:
                     for key in target.keys():
                         if key == "objects":
                             for objectName in target[key].keys():
+                                #We add all the objects contained in "objectName" into global dictionary "Object.
+                                #objects" and their name into local "objects" list to give a tree structure
                                 object = Object(objectName,target[key][objectName])
                                 #add object into Object.objects
                                 Object.addObject(objectName,object)
                                 #add object into Object.objectsLib
-                                Object.objectsLib[objectName]=object
+                                Object.objectsLib[objectName]=object #TODO you can only reference "objects" of the first level
                         elif key == "relations":
                             for relationName in target[key].keys():
                                 relation = Relation(relationName,target[key][relationName])
                                 Relation.addRelation(relationName,relation)
                                 Object.addRelation(relationName,relation)
                                 Object.relationsLib[relationName]=relation
-                        elif key == 'nature':
-                            pass
-                        else:
-                            raise error("Error 08: field "+key+" in library is not recognised !")
         except IOError:
             err_str+=('Error 02: library file is not found!\n')
             list_obj=['Error 02']
@@ -383,8 +381,8 @@ class Object:
                 if nested_json['objects'][objName]:
                     #Construct "object" recursively
                     object = Object(objName,nested_json['objects'][objName])
-                    self.objects.append(objName) #TODO we construct the local "objects" list
-                    Object.objects[objName] = object #TODO We construct the global "objects" dictionary
+                    self.objects.append(objName) #TODO we construct the local "objects" list of strings
+                    Object.objects[objName] = object #TODO We construct the global "objects" dictionary of objects
                 else :  # case of empty str read from a file
                     f=open(Object.folder+objName+".rau",'r')        #open a file for reading
                     s=f.read()              #read the content of file f
@@ -397,7 +395,7 @@ class Object:
         #relations must be an array
         if 'relations' in nested_json.keys():
             for rel in nested_json['relations'] :
-                if not nested_json['relations'][rel] : # case of empty str read from a file
+                if not nested_json['relations'][rel]: # case of empty str read from a file
                     f=open(Object.folder+rel+".rau",'r')        #open a file for reading
                     s=f.read()              #read the content of file f
                     #return a python object out of a json object
@@ -411,8 +409,8 @@ class Object:
                     self.relations.append(rel)
                 else :
                     relation = Relation(rel,nested_json['relations'][rel])
-                    Object.relations[rel] = relation
-                    self.relations.append(rel)
+                    Object.relations[rel] = relation #TODO we construct the global "relations" dictionary of relations
+                    self.relations.append(rel) #TODO we construct the local "relations" list of strings
 
 
     def inherit(self,parent):
