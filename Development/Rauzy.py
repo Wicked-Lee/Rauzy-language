@@ -184,7 +184,6 @@ def val_root(tarname,target,isroot,list_obj,list_rel,rootobj,rootrel):
 
 #prints the model in screen
 def printModel():
-    print (model)
     print (model.toStr(""))
 
 def flattenModel():
@@ -192,23 +191,25 @@ def flattenModel():
     print('*'*80+'\n'+'Flattened objects:\n')
     for obj in Object.flatObj.keys():
         print(obj,':')
-        print(Object.flatObj[obj].toStr("flat"))
+        print(Object.flatObj[obj].toStr2("",'flat'))
     print('*'*80+'\n'+'Flattened relations:\n')
     for rel in Object.flatRel.keys():
         print(rel,':')
-        print(Object.flatRel[rel].toStr("flat"))
+        print(Object.flatRel[rel].toStr(""))
 
 def abstractModel(level):
-    for obj in Object.objects.keys():
-        print(obj,':')
-        print(Object.objects[obj].toStr(""))
-    for rel in Object.relations.keys():
-        print(rel,':')
-        print(Object.relations[rel].toStr(""))
+    print(model.toStr2('',"abstract "+str(level)))
 
 def modifyModel(field,newvalue):
-    pass
-
+    dest=field.split('.')
+    key=Nddone
+    try:
+        for index in dest:
+            if index=[]
+            else:
+                raise error('The field is not '+index+' defined! Try another field:')
+    except error as e:
+            e.toStr()
 def compareModels():
     pass
 
@@ -288,7 +289,7 @@ while(input1!='exit'):
                 abstractModel(input1.split()[1])
     elif input1=='modify':
         if model:
-            field=input('Field to be modified: ')
+            field=input('Field to be modified(use "." as separator): ')
             newfield=input('The new value: ')
             commit=input('Commit the changes?(y/n): ')
             if commit=='y':

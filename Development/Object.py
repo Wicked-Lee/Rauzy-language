@@ -428,12 +428,8 @@ class Object:
             if parent.relations:
                 for rel in parent.relations :
                     self.relations.append(rel)
-
-#returns a string representation of this object
+    #return a string representation of the object
     def toStr(self,indent):
-        if indent=="flat":
-            flat=True
-            indent=''
         #print('objects:'+self.name,self.parent)
         output = indent + "Name : " + self.name +"\n"
         if self.parent:
@@ -447,7 +443,44 @@ class Object:
             for objName in self.objects :
                 obj = Object.findObject(objName)
                 output += obj.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"
-        if self.relations and not flat:
+        if self.relations:
+            output += indent + "Relations : \n"
+            for relName in self.relations :
+                rel = Object.findRelation(relName)
+                output += rel.toStr(indent + "\t") + "\t"+indent + "__________________________________\n"
+        return output
+
+    #returns a string representation of this object according to "func" indication
+    def toStr2(self,indent,func):
+        flat=False
+        abstract=False
+        level=0
+        level2=100
+        if func=="flat":
+            flat=True
+        if func.startswith('abstract'):
+            abstract=True
+            if len(func.split())==2:
+                level2=int(func.split()[1])
+                if level>level2:
+                    abstract=False
+                    return ''
+        #print('objects:'+self.name,self.parent)
+        output = indent + "Name : " + self.name +"\n"
+        if self.parent:
+            output += indent + "Extends : " + self.parent +"\n"
+        if self.properties:
+            output += indent + "Properties : \n"
+            for prop in self.properties.keys() :
+                output += indent+"\t" +prop +" : " + self.properties[prop] + "\n"
+        if self.objects:
+            output += indent + "Objects : \n"
+            for objName in self.objects :
+                obj = Object.findObject(objName)
+                if abstract:
+                    func='abstract '+str(level2-1)
+                output += obj.toStr2(indent + "\t",func) + "\t"+indent + "__________________________________\n"
+        if self.relations and not flat and not abstract:
             output += indent + "Relations : \n"
             for relName in self.relations :
                 rel = Object.findRelation(relName)
@@ -510,3 +543,4 @@ class Object:
             Object.flatObj[obj]=temp
         for rel in list_rel:
             Object.flatRel[rel]=Object.findRelation(rel)
+
