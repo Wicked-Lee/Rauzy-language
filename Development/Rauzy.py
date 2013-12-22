@@ -202,16 +202,58 @@ def abstractModel(level):
 
 def modifyModel(field,newvalue):
     dest=field.split('.')
-    key=Nddone
-    try:
-        for index in dest:
-            if index=[]
-            else:
-                raise error('The field is not '+index+' defined! Try another field:')
-    except error as e:
-            e.toStr()
+    nl=0
+    #The first element is always the nature of the object
+    if dest[nl]=='object':
+        key=Object.findObject(dest[1])
+        nl=nl+2
+    elif dest[nl]=='relation':
+        key=Object.findRelation(dest[1])
+        nl=nl+2
+    elif dest[nl]=='library':
+        print('The current version does not support this function...')
+        nl=nl+1
+        return
+    #If we want to change the parent, we will change the string "extends"
+    if dest[nl]=='parent':
+        key=key.parent
+        key.parent=newvalue#will it work?
+        nl+=1
+    #If we want to change properties, we will change one of its properties
+    elif dest[nl]=='properties':
+        key=key.properties
+        key[dest[nl+1]]=newvalue
+        nl=nl+2
+    #If we want to change 'relations', we will change the name of the relation
+    elif dest[nl]=='relations':
+        key=key.relations
+        key.remove(dest[nl+1])
+        key.append(newvalue)
+    #If we want to change 'objects', we will change the name of the object
+    elif dest[nl]=='objects':
+        key=key.objects
+        key.remove(dest[nl+1])
+        key.append(newvalue)
+    else:
+        print('The current version does not support the function')
+
 def compareModels():
     pass
+
+def checkModel(name):
+    if name=='model':
+        print(model.__str__())
+    elif name=='objects':
+        for obj in Object.objects.keys():
+            print(obj+":",Object.objects[obj].__str__())
+    elif name=='relations':
+        return
+    elif name=='objectsLib':
+        return
+    elif name=='relationsLib':
+        return
+    else:
+        print('The object to be check is not recognized!')
 
 #root Object
 ##model = parse("Bank.rau")
@@ -294,6 +336,17 @@ while(input1!='exit'):
             commit=input('Commit the changes?(y/n): ')
             if commit=='y':
                 modifyModel(field,newfield)
+    #reserved for debugging
+    elif input1.startswith('check'):
+        pw=input('enter the password:')
+        if pw=='checkmodel':
+            if model:
+                if len(input1.split())!=2:
+                    print('usage:check <name>(objects,relations, objectsLib,relationsLib,model)')
+                else:
+                    checkModel(input1.split()[1])
+        else:
+            print('incorrect password!')
     else :
         print('Function not recognized!')
         print ('type \'help\' for help')

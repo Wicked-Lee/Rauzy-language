@@ -428,6 +428,26 @@ class Object:
             if parent.relations:
                 for rel in parent.relations :
                     self.relations.append(rel)
+    #return a raw string representation of the object
+    def __str__(self):
+        output = "Name : " + self.name +"\n"
+        if self.parent:
+            output += "Extends : " + self.parent +"\n"
+        if self.properties:
+            output += "Properties : \n"
+            for prop in self.properties.keys() :
+                output += "\t" +prop +" : " + self.properties[prop] + "\n"
+        if self.objects:
+            output += "Objects : \n"
+            output += "\t" +self.objects.__str__() + "\n"
+        if self.relations:
+            output +=  "Relations : \n"
+            output += "\t" +self.relations.__str__() + "\n"
+        if self.library:
+            output+="Library :\n"
+            output+="\t"+self.library+"\n"
+        return output
+
     #return a string representation of the object
     def toStr(self,indent):
         #print('objects:'+self.name,self.parent)
