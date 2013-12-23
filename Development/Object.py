@@ -9,6 +9,7 @@ from collections import defaultdict
 class Object:
 
     model = False
+    comp=False
     folder = ""
 #library of all objects dictionary key = object name , value = Object
     objects = dict()
@@ -18,6 +19,15 @@ class Object:
     objectsLib = dict()
 #library with only the referenced relations
     relationsLib = dict()
+#library of all objects dictionary key = object name , value = Object
+    objects2 = dict()
+#library of relations dictionary key = relation name , value = relation value
+    relations2 = dict()
+#library with only the referenced objects
+    objectsLib2 = dict()
+#library with only the referenced relations
+    relationsLib2 = dict()
+
 #dict of objects to be flattened
     flatObj=dict()
 #dict of relations to be flattened
@@ -47,13 +57,27 @@ class Object:
     def findRelation(name):
         if name in Object.relations.keys() :
             return Object.relations[name]
+    @staticmethod
+    def findLibObject(name):
+        if name in Object.objectsLib.keys() :
+            return Object.objectsLib[name]
+    @staticmethod
+    def findLibRelation(name):
+        if name in Object.relationsLib.keys() :
+            return Object.relationsLib[name]
 
     @staticmethod
     def addObject(name,object):
-        Object.objects[name]=object
+        if not Object.comp:
+            Object.objects[name]=object
+        else:
+            Object.objects2[name]=object
     @staticmethod
     def addRelation(name,value):
-        Object.relations[name]=value
+        if not Object.comp:
+            Object.relations[name]=value
+        else:
+            Object.relations2[name]=value
 
 #handle "Error 02:the library file xx is not found!"
     @staticmethod
@@ -94,27 +118,23 @@ class Object:
                                 #add object into Object.objects
                                 Object.addObject(objectName,object)
                                 #add object into Object.objectsLib
-                                Object.objectsLib[objectName]=object #TODO you can only reference "objects" of the first level
+                                if not Object.comp:
+                                    Object.objectsLib[objectName]=object #TODO you can only reference "objects" of the first level
+                                else:
+                                    Object.objectsLib2[objectName]=object
                         elif key == "relations":
                             for relationName in target[key].keys():
                                 relation = Relation(relationName,target[key][relationName])
                                 Relation.addRelation(relationName,relation)
                                 Object.addRelation(relationName,relation)
-                                Object.relationsLib[relationName]=relation
+                                if not Object.comp:
+                                    Object.relationsLib[relationName]=relation
+                                else:
+                                    Object.relationsLib2[relationName]=relation
         except IOError:
             err_str+=('Error 02: library file is not found!\n')
             list_obj=['Error 02']
         return [err_str,war_str,list_obj,list_rel]
-#		try:
-#			if err_str!='':
-#				raise error(err_str)
-#		except error as e:
-#				e.toStr()
-#		try:
-#			if war_str!='':
-#				raise warning(war_str)
-#		except warning as w:
-#				w.toStr()
 
     ##handle "Error 03: the object xx is not defined !"
     ##handle "Error 04:the relation xx is not defined !"
@@ -383,7 +403,10 @@ class Object:
                         #Construct "object" recursively
                         obj = Object(objName,nested_json['objects'][objName])
                         self.objects.append(objName) #TODO we construct the local "objects" list of strings
-                        Object.objects[objName] = obj #TODO We construct the global "objects" dictionary of "Object"s
+                        if not Object.comp:
+                            Object.objects[objName] = obj #TODO We construct the global "objects" dictionary of "Object"s
+                        else:
+                            Object.objects2[objName]=obj
                     else :  # case of empty str read from a file
                         f=open(Object.folder+objName+".rau",'r')        #open a file for reading
                         s=f.read()              #read the content of file f
@@ -392,7 +415,10 @@ class Object:
                         f.close()
                         object = Object(objName,target)
                         self.objects.append(objName)
-                        Object.objects[objName] = object
+                        if not Object.comp:
+                            Object.objects[objName] = object
+                        else:
+                            Object.objects2[objName]=object
             #relations must be an array
             if 'relations' in nested_json.keys():
                 for rel in nested_json['relations'] :
@@ -404,13 +430,19 @@ class Object:
                         f.close()
                         relation = Relation(rel,target)
                         self.objects.append(rel)
-                        Object.relations[rel] = relation
+                        if not Object.comp:
+                            Object.relations[rel] = relation
+                        else:
+                            Object.relations2[rel]=relation
                         self.relations.append(rel)
                     if isinstance(nested_json['relations'][rel], str) :
                         self.relations.append(rel)
                     else :
                         relation = Relation(rel,nested_json['relations'][rel])
-                        Object.relations[rel] = relation #TODO we construct the global "relations" dictionary of relations
+                        if not Object.comp:
+                            Object.relations[rel] = relation #TODO we construct the global "relations" dictionary of relations
+                        else:
+                            Object.relations2[rel]=relation
                         self.relations.append(rel) #TODO we construct the local "relations" list of strings
 
     def inherit(self,parent):
@@ -457,7 +489,7 @@ class Object:
         if self.properties:
             output += indent + "Properties : \n"
             for prop in self.properties.keys() :
-                output += indent+"\t" +prop +" : " + str(self.properties[prop])+ "\n"
+                output += indent+"\t" +prop +" : " + self.properties[prop] + "\n"
         if self.objects:
             output += indent + "Objects : \n"
             for objName in self.objects :
@@ -492,8 +524,8 @@ class Object:
         if self.properties:
             output += indent + "Properties : \n"
             for prop in self.properties.keys() :
-                output += indent+"\t" +prop +" : " + str(self.properties[prop]) + "\n"
-        if self.objects:
+                output += indent+"\t" +prop +" : " + self.properties[prop] + "\n"
+        if self.objects and not flat:
             output += indent + "Objects : \n"
             for objName in self.objects :
                 obj = Object.findObject(objName)
@@ -515,7 +547,7 @@ class Object:
             output += indent + "\"library\" : " + "\""+self.library+"\",\n"
         if self.parent:
             output += indent + "\"extends\" : \"" + self.parent +"\",\n"
-        if self.objects:
+        if not self.parent and self.objects:
             output += indent + "\"objects\" : "+ indent +"{\n"
             for objName in self.objects :
                 output += indent + "\t\"" + objName + "\" : "
@@ -525,7 +557,7 @@ class Object:
             #erase last comma
             output = output[:-2] + "\n"
             output += indent  + "},\n"
-        if self.relations:
+        if not self.parent and self.relations:
             output += indent + "\t\"relations\" : {\n"
             for rel in self.relations:
                 relation = Object.findRelation(rel)

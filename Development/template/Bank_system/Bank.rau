@@ -15,7 +15,7 @@
 						"Technician1":{"nature":"object","properties":{"name":"Jack","salary":"3000","working_age":"10"}},
 						"Technician2":{"nature":"object","properties":{"name":"Alice","salary":"3000","working_age":"8"}}
 						},
-					"properties":{"Budget(dollars)":10000,"director":"Thomas DUPONT"}
+					"properties":{"Budget(dollars)":"10000","director":"Thomas DUPONT"}
 					},
 				"Installation team":
 					{
@@ -28,7 +28,7 @@
 					"properties":{"Budget(dollars)":"20000","director":"Bill CHOU"}
 					}
 				},
-			"properties":{"Budget(dollars)":"30000","director":"Ivan","partners":["Microsoft","IBM"]}	
+			"properties":{"Budget(dollars)":"30000","director":"Ivan","partners":"Microsoft"}	
 			},
 		"Department_Maketing":
 			{

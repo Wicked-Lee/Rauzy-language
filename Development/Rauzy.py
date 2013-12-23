@@ -23,20 +23,6 @@ def parse(file):
         Object.model = False
         Relation.model = False
         model = None
-##        print ('type \'help\' for help')
-##        input1=input('>>')
-##        #input1 = raw_input('>>')
-##        while(input1!='exit') :
-##            if input1.startswith('read'):
-##                Object.objects = dict()
-##                Object.relations = dict()
-##                Object.objectsLib = dict()
-##                Object.relationsLib = dict()
-##                if len(input1.split()) != 2:
-##                    folders = file.split("/")
-##                    for i in range(0,len(folders)-1):
-##                            Object.folder += folders[i] +"/"
-
         #open and then read the file
         err_str=''
         war_str=''
@@ -72,16 +58,13 @@ def parse(file):
         war_str+=valstr2[1]
         try:
                 if err_str != "":
-                        ##print ('There are errors!\n')
                         raise error(err_str)
                 else:
-                        ##print('a model will be constructed!\n')
                         Object.model = True
                         Relation.model = True
                         model = Object(file.split(".")[0],target)
-                        Object.flatten(rootobj,rootrel)
-                        #print(Object.objects)
-                        #print(Object.objects['TeamA'].toStr(""))
+                        if not Object.comp:
+                            Object.flatten(rootobj,rootrel)
         except error as e:
                 e.toStr()
         try:
@@ -96,20 +79,23 @@ def parse(file):
 #One file for root object
 #One file (library) for the rest objects
 def toFile(folder):
-	if not os.path.exists(folder):
-		os.makedirs(folder)
-	f = open(folder+'/'+model.name+'.rau','w')
-	f.write(model.toJson(""))
-	lib = open(folder + '/'+model.library,'w')
-	library = "{\n \"nature\" : \"library\", \n \"objects\" : \n{\n"
-	for obj in Object.objectsLib:
-		library += "\t\""+obj+"\" : \n" + Object.objectsLib[obj].toJson("\t") +",\n"
-	library = library[:-2] + "\n"
-	library += "\t},\n \"relations\" : \n {\n"
-	for rel in Object.relationsLib:
-		library += Object.relationsLib[rel].toJson("\t") + "\n"
-	library += "\n}\n}"
-	lib.write(library)
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+#export .rau file
+    f = open(folder+'/'+model.name+'.rau','w')
+    f.write(model.toJson(""))
+#export library file
+    lib = open(folder + '/'+model.library,'w')
+    library = "{\n \"nature\" : \"library\", \n \"objects\" : \n{\n"
+    for obj in Object.objectsLib:
+        library += "\t\""+obj+"\" : \n" + Object.objectsLib[obj].toJson("\t") +",\n"
+    library = library[:-2] + "\n"
+    library += "\t},\n \"relations\" : \n {\n"
+    for rel in Object.relationsLib:
+        library += Object.relationsLib[rel].toJson("\t") + ",\n"
+    library = library[:-2]
+    library += "\n}\n}"
+    lib.write(library)
 
 
 #handle "Error 01: xx in the xx not defined!"
@@ -203,21 +189,30 @@ def abstractModel(level):
 def modifyModel(field,newvalue):
     dest=field.split('.')
     nl=0
+    key=None
     #The first element is always the nature of the object
     if dest[nl]=='object':
-        key=Object.findObject(dest[1])
+        key=Object.findObject(dest[nl+1])
         nl=nl+2
     elif dest[nl]=='relation':
-        key=Object.findRelation(dest[1])
+        key=Object.findRelation(dest[nl+1])
         nl=nl+2
     elif dest[nl]=='library':
-        print('The current version does not support this function...')
-        nl=nl+1
+        if dest[nl+1]=='object':
+            key=Object.findLibObject(dest[nl+2])
+        elif dest[nl+1]=='relations':
+            key=Object.findLibRelation(dest[nl+2])
+        else:
+            print('There is no '+dest[nl+1]+' field in the library!')
+            return
+        nl=nl+3
+    else:
+        print('The first field name is not recognized!')
         return
     #If we want to change the parent, we will change the string "extends"
-    if dest[nl]=='parent':
+    if dest[nl]=='extends':
         key=key.parent
-        key.parent=newvalue#will it work?
+        key.parent=newvalue
         nl+=1
     #If we want to change properties, we will change one of its properties
     elif dest[nl]=='properties':
@@ -235,10 +230,19 @@ def modifyModel(field,newvalue):
         key.remove(dest[nl+1])
         key.append(newvalue)
     else:
-        print('The current version does not support the function')
+        print('The field name is not recognized !')
+        return
 
 def compareModels():
-    pass
+    if Object.objects2:
+        list_obj=[]
+        list_rel=[]
+        for obj in Object.objects:
+            for obj2 in Object.objects2:
+                if obj==obj2:
+                    list_obj={}
+    else:
+        print('The second model does not exist !')
 
 def checkModel(name):
     if name=='model':
@@ -247,11 +251,26 @@ def checkModel(name):
         for obj in Object.objects.keys():
             print(obj+":",Object.objects[obj].__str__())
     elif name=='relations':
-        return
+       for rel in Object.relations.keys():
+            print(obj+":",Object.relations[rel].__str__())
     elif name=='objectsLib':
-        return
+        for obj in Object.objectsLib.keys():
+            print(obj+":",Object.objectsLib[obj].__str__())
     elif name=='relationsLib':
-        return
+        for rel in Object.relationsLib.keys():
+            print(obj+":",Object.relationsLib[rel].__str__())
+    elif name=='objects2':
+        for obj in Object.objects2.keys():
+            print(obj+":",Object.objects2[obj].__str__())
+    elif name=='relations2':
+       for rel in Object.relations2.keys():
+            print(obj+":",Object.relations2[rel].__str__())
+    elif name=='objectsLib2':
+        for obj in Object.objectsLib2.keys():
+            print(obj+":",Object.objectsLib[obj].__str__())
+    elif name=='relationsLib2':
+        for rel in Object.relationsLib2.keys():
+            print(obj+":",Object.relationsLib[rel].__str__())
     else:
         print('The object to be check is not recognized!')
 
@@ -263,8 +282,7 @@ print ('type \'help\' for help')
 input1=input('>>')
 #input1 = raw_input('>>')
 while(input1!='exit'):
-    if input1.startswith('read'):
-        #print('begin to read')
+    if input1.startswith('read') and not input1.startswith('read2'):
         Object.objects = dict()
         Object.relations = dict()
         Object.objectsLib = dict()
@@ -280,10 +298,13 @@ while(input1!='exit'):
     elif input1.startswith('read2'):
         if model:
             print('Read another model for comparaison')
-            Object.objects = dict()
-            Object.relations = dict()
-            Object.objectsLib = dict()
-            Object.relationsLib = dict()
+            Object.comp=True
+            Relation.comp=True
+            Object.objects2 = dict()
+            Object.relations2 = dict()
+            Object.objectsLib2 = dict()
+            Object.relationsLib2 = dict()
+            Relation.relations2=dict()
             if len(input1.split()) != 2:
                 print ('usage: read <file name>')
             else :
@@ -291,7 +312,9 @@ while(input1!='exit'):
                 if not os.path.exists(file):
                     print ('file \'' + file + '\' does not exist')
                 else:
-                    model = parse(file)
+                    model2=parse(file)
+            Object.comp=False
+            Relation.comp=False
     elif input1 == "help":
         print ("Available commands")
         print ('read <file name> \t to load the basic model')
