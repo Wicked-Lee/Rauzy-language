@@ -12,29 +12,29 @@
 					"nature":"object",
 					"objects":
 						{
-						"Technician1":{"nature":"object","properties":{"name":"Jack","salary":3000,"working_age":10}},
-						"Technician2":{"nature":"object","properties":{"name":"Alice","salary":3000,"working_age":8}}
+						"Technician1":{"nature":"object","properties":{"name":"Jack","salary":"3000","working_age":"10"}},
+						"Technician2":{"nature":"object","properties":{"name":"Alice","salary":"3000","working_age":"8"}}
 						},
-					"properties":{"Budget(dollars)":10000,"director":"Thomas"}
+					"properties":{"Budget(dollars)":10000,"director":"Thomas DUPONT"}
 					},
 				"Installation team":
 					{
 					"nature":"object",
 					"objects":
 						{
-						"Technician3":{"nature":"object","objects":{"Intern1":{"nature":"object"}},"properties":{"name":"Tom","salary":3500,"working_age":15}},
-						"Technician4":{"nature":"object","properties":{"name":"Jimmy","salary":3000,"working_age":5}}
+						"Technician3":{"nature":"object","objects":{"Intern1":{"nature":"object"}},"properties":{"name":"Tom","salary":"3500","working_age":"15"}},
+						"Technician4":{"nature":"object","properties":{"name":"Jimmy","salary":"3000","working_age":"5"}}
 						},
-					"properties":{"Budget(dollars)":20000,"director":"Bill"}
+					"properties":{"Budget(dollars)":"20000","director":"Bill CHOU"}
 					}
 				},
-			"properties":{"Budget(dollars)":30000,"director":"Ivan",""partners":["Microsoft","IBM"]}	
+			"properties":{"Budget(dollars)":"30000","director":"Ivan","partners":["Microsoft","IBM"]}	
 			},
 		"Department_Maketing":
 			{
 			"nature":"object",
-			"extends":"Maketing_organization"
-			"properties":{"Budget(dollars)":50000,"director":"Martin"}
+			"extends":"Maketing_organization",
+			"properties":{"Budget(dollars)":"50000","director":"Martin WHO"}
 			},
 		"Clients":
 			{
@@ -46,39 +46,49 @@
 					"nature":"object",
 					"objects":
 						{
-						"customer1":{"nature":"object","properties":{}}
-						"customer2":{"nature":"object","properties":{}}
+						"customer1":{"nature":"object","extends":"Youth","properties":{"Account(dollars)":"20000","name":"Michel MATIN"}},
+						"customer2":{"nature":"object","extends":"Adult","properties":{"Account(dollars)":"100000","name":"Michelle SOIR"}}
 						},
 					"properties":{}
-					}
+					},
 				"Company":
 					{
 					"nature":"object",
 					"objects":
 						{
-						"company1":{"nature":"object","properties":{}}
-						"company2":{"nature":"object","properties":{}}
+						"company1":{"nature":"object","properties":{"Account(kdollars)":"2000","name":"Saint Gobin"}},
+						"company2":{"nature":"object","properties":{"Account(kdollars)":"3000","name":"Schneider Electric"}}
 						},
 					"properties":{}
 					}
-				}
+				},
+			"properties":{}
 			}  
 		},
 	"relations":
 		{  
-		"Technical_support":
+		"IT_support":
 			{
+			"nature":"relation",
+			"from":["Department_IT"],
+			"to":["Department_Maketing"],
+			"directional":true
 			},
-		"Clients":
+		"Invest_Consulting":
 			{
-			},
-		"Consulting":
-			{
+			"nature":"relation",
+			"extends":"consulting",
+			"from":["Department_Maketing"],
+			"to":["Clients"]
 			},
 		"Cooperation":
 			{
+			"nature":"relation",
+			"extends":"sharing",
+			"from":["Maintenance team","Installation team"],
+			"to":["Department_Maketing"]
 			}
 		},
-	"properties":{"name":"BNP Parisbas","director":"Unknown","address":"Paris"},
+	"properties":{"name":"BNP Parisbas","director":"Qn ELEVEDELX","address":"Paris"},
 	"library":"lib"
 }

@@ -5,33 +5,51 @@
 			"Human":
 				{
 				  "nature":"object",
-				  "properties":{"name":"Anonymous","lastname":"Anonymous","gender":"unknown"}
+				  "properties":{"name":"Anonymous","gender":"unknown"}
 				},
-			"Student":
+			"Youth":
 				{
 				  "nature":"object",
 				  "extends":"Human",
-				  "properties":{"university":"unknown","age":"unknown","ISIC_number":"unknown"}
+				  "properties":{"university":"unknown","<26":"true","ISIC_number":"unknown"}
 				},
-			"Team":{
+			"Adult":
+				{
+				  "nature":"object",
+				  "extends":"Human",
+				  "properties":{"<26":"false","profession":"unknown"}
+				},
+			"Maketing_organization":
+				{
 				"nature":"object",
-				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student2":{"nature":"object", "extends":"Student"}}
-				"relations":{"Playwith":{"nature":relation","extends":"collaboration","directional":"false","from":"Student1","to":"Student2"}}				
+				"objects":{
+					"seller":{"nature":"object", "extends":"Human","properties":{"number":"unknown"}},
+					"manager":{"nature":"object", "extends":"Human","properties":{"number":"unkown"}}
+					  },
+				"relations":{
+					"lead":{"nature":"relation","extends":"leadership","from":["manager"],"to":["seller"]}
+					    }				
 				}
 		},
 	"relations":
 		{
-			"ownership":
+			"consulting":
 				{
-				  "nautre":"relation",
+				  "nature":"relation",
 				  "directional":true,
-				  "properties":{"posessions":"things"}
-				}
-			"collaboration":
+				  "properties":{"product":"solutions","way":"analysis"}
+				},
+			"sharing":
 				{
 				  "nature":"relation",
 				  "directional":false,
-				  "properties":{"type":"working relation"}
+				  "properties":{"isrelation":"true","haveauthority":"false"}
+				},
+			"leadership":
+				{
+				  "nature":"relation",
+				  "directional":true,
+				  "properties":{"haveauthority":"true"}
 				}
 		}
 }

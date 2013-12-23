@@ -457,7 +457,7 @@ class Object:
         if self.properties:
             output += indent + "Properties : \n"
             for prop in self.properties.keys() :
-                output += indent+"\t" +prop +" : " + self.properties[prop] + "\n"
+                output += indent+"\t" +prop +" : " + str(self.properties[prop])+ "\n"
         if self.objects:
             output += indent + "Objects : \n"
             for objName in self.objects :
@@ -492,7 +492,7 @@ class Object:
         if self.properties:
             output += indent + "Properties : \n"
             for prop in self.properties.keys() :
-                output += indent+"\t" +prop +" : " + self.properties[prop] + "\n"
+                output += indent+"\t" +prop +" : " + str(self.properties[prop]) + "\n"
         if self.objects:
             output += indent + "Objects : \n"
             for objName in self.objects :
