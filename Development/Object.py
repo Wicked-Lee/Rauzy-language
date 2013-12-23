@@ -32,6 +32,10 @@ class Object:
     flatObj=dict()
 #dict of relations to be flattened
     flatRel=dict()
+#dict of objects to be flattened
+    flatObj2=dict()
+#dict of relations to be flattened
+    flatRel2=dict()
     @staticmethod
     def dupe_checking_hook(pairs):
         result = dict()
@@ -49,14 +53,22 @@ class Object:
 #handle "Error 03: the object xx is not defined !"
     @staticmethod
     def findObject(name):
-        if name in Object.objects.keys() :
-            return Object.objects[name]
+        if not Object.comp:
+            if name in Object.objects.keys() :
+                return Object.objects[name]
+        else:
+            if name in Object.objects2.keys():
+                return Object.objects2[name]
 #finds the relation with the given name
 #handle "Error 04:the relation xx is not defined !"
     @staticmethod
     def findRelation(name):
-        if name in Object.relations.keys() :
-            return Object.relations[name]
+        if not Object.comp:
+            if name in Object.relations.keys() :
+                return Object.relations[name]
+        else:
+            if name in Object.relations2.keys():
+                return Object.relations2[name]
     @staticmethod
     def findLibObject(name):
         if name in Object.objectsLib.keys() :
@@ -398,7 +410,6 @@ class Object:
             self.parent = ""
             if 'objects' in nested_json.keys():
                 for objName in nested_json['objects'].keys():
-                    #What is this? Is it a boolean?
                     if nested_json['objects'][objName]:
                         #Construct "object" recursively
                         obj = Object(objName,nested_json['objects'][objName])
@@ -592,7 +603,13 @@ class Object:
                     for relName in temp.relations:
                         if relName not in list_rel:
                             list_rel.append(relName)
-            Object.flatObj[obj]=temp
+            if not Object.comp:
+                Object.flatObj[obj]=temp
+            else:
+                Object.flatObj2[obj]=temp
         for rel in list_rel:
-            Object.flatRel[rel]=Object.findRelation(rel)
+            if not Object.comp:
+                Object.flatRel[rel]=Object.findRelation(rel)
+            else:
+                Object.flatRel2[rel]=Object.findRelation(rel)
 

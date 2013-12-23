@@ -13,8 +13,12 @@ class Relation:
             Relation.relations2[name]=value
     @staticmethod
     def findRelation(name):
-        if name in Relation.relations.keys() :
-            return Relation.relations[name]
+        if not Relation.comp:
+            if name in Relation.relations.keys() :
+                return Relation.relations[name]
+        else:
+            if name in Relation.relations2.keys():
+                return Relation.relations2[name]
 
     def __init__(self,name,parent,sources,targets,directional):
         self.name = name

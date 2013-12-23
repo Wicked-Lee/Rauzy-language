@@ -11,7 +11,7 @@
 				{"nature":"object",
 				"properties" : {"Id":"AB325E","amount":"30000"}
 				}, 
-			"TeamA":
+			"Clients":
 				{
 				"nature":"object",
 				"extends":"Team",
@@ -22,13 +22,13 @@
 				"nature":"object",
 				"objects":
 				    {
-					"Employer1":
+					"Technician1":
 					{"nature":"object",
 					"extends":"Human",
 					"properties" : 
 						{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
 					},
-					"Employer2":
+					"Technician2":
 					{"nature":"object",
 					"extends":"Human",
 					"properties" : 

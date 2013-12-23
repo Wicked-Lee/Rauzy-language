@@ -63,8 +63,7 @@ def parse(file):
                         Object.model = True
                         Relation.model = True
                         model = Object(file.split(".")[0],target)
-                        if not Object.comp:
-                            Object.flatten(rootobj,rootrel)
+                        Object.flatten(rootobj,rootrel)
         except error as e:
                 e.toStr()
         try:
@@ -171,6 +170,12 @@ def val_root(tarname,target,isroot,list_obj,list_rel,rootobj,rootrel):
 #prints the model in screen
 def printModel():
     print (model.toStr(""))
+    print('*'*40)
+    Object.comp=True
+    Relation.comp=True
+    print(model2.toStr(""))
+    Object.comp=False
+    Relation.comp=False
 
 def flattenModel():
     print()
@@ -235,12 +240,23 @@ def modifyModel(field,newvalue):
 
 def compareModels():
     if Object.objects2:
+        nb_obj=len(Object.flatObj.keys())
+        nb_obj2=len(Object.flatObj2.keys())
+        nb_rel=len(Object.flatRel.keys())
+        nb_rel2=len(Object.flatRel2.keys())
         list_obj=[]
         list_rel=[]
-        for obj in Object.objects:
-            for obj2 in Object.objects2:
-                if obj==obj2:
-                    list_obj={}
+        for obj in Object.flatObj.keys():
+            if obj in Object.flatObj2.keys():
+                list_obj.append(obj)
+        for rel in Object.flatRel.keys():
+            if rel in Object.flatRel2.keys():
+                list_rel.append(rel)
+        print('The basic model has\n '+str(nb_obj)+' objects \nwhile the second model has \n'+str(nb_obj2)+' objects')
+        print('\nThe basic model has\n'+str(nb_rel)+' relations \nwhile the second model has \n'+str(nb_rel2)+' relations')
+        print('\nThese object names exist in both two models:\n'+list_obj.__str__())
+        print('\nThese relation names exist in both two models:\n'+list_rel.__str__())
+
     else:
         print('The second model does not exist !')
 
@@ -259,6 +275,12 @@ def checkModel(name):
     elif name=='relationsLib':
         for rel in Object.relationsLib.keys():
             print(obj+":",Object.relationsLib[rel].__str__())
+    elif name=='flatObj':
+        for obj in Object.flatObj.keys():
+            print(obj+":",Object.flatObj[obj].__str__())
+    elif name=='flatRel':
+        for rel in Object.flatRel.keys():
+            print(rel+":",Object.flatRel[rel].__str__())
     elif name=='objects2':
         for obj in Object.objects2.keys():
             print(obj+":",Object.objects2[obj].__str__())
@@ -271,6 +293,12 @@ def checkModel(name):
     elif name=='relationsLib2':
         for rel in Object.relationsLib2.keys():
             print(obj+":",Object.relationsLib[rel].__str__())
+    elif name=='flatObj2':
+        for obj in Object.flatObj2.keys():
+            print(obj+":",Object.flatObj2[obj].__str__())
+    elif name=='flatRel':
+        for rel in Object.flatRel2.keys():
+            print(rel+":",Object.flatRel2[rel].__str__())
     else:
         print('The object to be check is not recognized!')
 
