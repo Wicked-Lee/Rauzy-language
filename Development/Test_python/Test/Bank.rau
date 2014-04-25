@@ -1,7 +1,6 @@
 {
 	"nature":"object",
-	"objects": 
-			{  
+	"objects":{
 			"Customer1":{
 				"nature":"object",
 				"extends":"Human",
@@ -10,44 +9,40 @@
 			"Account1":
 				{"nature":"object",
 				"properties" : {"Id":"AB325E","amount":"30000"}
-				}
-			"Department1":
-				{
+				},
+			"Department1":{
 				"nature":"object",
 				"objects":
 				{
-					"Employer1":
-					{"nature":"object",
-					"extends":"Human",
+					"Employer1":{
+					"nature" : "object",
+					"extends" : "Human",
 					"properties" : 
 						{"name":"Kostas", "lastname":"Papadopoulos", "salary":"20000", "worksIn":"frontdesk"}
 					},
-					"Employer2":
-					{"nature":"object",
+					"Employer2":{
+					"nature":"object",
 					"extends":"Human",
 					"properties" : 
 						{"name":"Wushika", "lastname":"nibula", "salary":"200000", "worksIn":"backdesk"}
 					}	
 				}
-				}  
-			},
-	"relations":
-		{  
-		  "owns":
-		   {
+			}  
+	},
+	"relations":{  
+		  "owns":{
 				 "nature" : "relation",
 				 "extends":"ownership",
 				 "from" : [ "Customer1" ],
 				 "to" : [ "Account1" ] 
 			},
-		  "HasOwner":
-			{
+		  "HasOwner":{
 				 "nature" : "relation", 
 				 "from" : [ "Account1" ],
 				 "to" : [ "Customer1" ], 
 				 "directional" : false 
 			}	 
-		},
+	},
 	"properties": {"name":"bnp Parisbas","address":"a"},
 	"library":"lib"
 }
