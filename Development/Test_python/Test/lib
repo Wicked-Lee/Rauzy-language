@@ -15,23 +15,37 @@
 				},
 			"Team":{
 				"nature":"object",
-				"objects":{"Student1":{"nature":"object", "extends":"Student"},"Student2":{"nature":"object", "extends":"Student"}}
-				"relations":{"Playwith":{"nature":relation","extends":"collaboration","directional":"false","from":"Student1","to":"Student2"}}				
-				}
+				"objects":{
+					"Student1":{
+						"nature":"object",
+						"extends":"Student"
+					},
+					"Student2":{
+						"nature":"object",
+						"extends":"Student"
+					}
+				},
+				"relations": {
+					"Playwith":{
+						"nature":"relation",
+						"extends":"collaboration",
+						"directional":false,
+						"from":["Student1"],
+						"to":["Student2"]
+					}
+				}				
+			}
 		},
-	"relations":
-		{
-			"ownership":
-				{
-				  "nautre":"relation",
+	"relations":{
+			"ownership":{
+				  "nature":"relation",
 				  "directional":true,
 				  "properties":{"posessions":"things"}
-				}
-			"collaboration":
-				{
+			},
+			"collaboration":{
 				  "nature":"relation",
 				  "directional":false,
 				  "properties":{"type":"working relation"}
-				}
-		}
+			}
+	}
 }
